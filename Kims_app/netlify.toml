@@ -1,0 +1,7 @@
+[build]
+  base = "draft_1/maintain-pro-7242f318"
+  command = "npm run build"
+  publish = "draft_1/maintain-pro-7242f318/dist"
+
+[build.environment]
+  NODE_VERSION = "20"
