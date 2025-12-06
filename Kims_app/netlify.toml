@@ -1,6 +1,6 @@
 [build]
   base = "draft_1/maintain-pro-7242f318"
-  command = "npm run build"
+  command = "npm ci --legacy-peer-deps"
   publish = "draft_1/maintain-pro-7242f318/dist"
 
 [build.environment]
