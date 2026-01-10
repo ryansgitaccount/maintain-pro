@@ -426,12 +426,8 @@ const AppLayout = ({ children, currentPageName }) => {
         <Sidebar className="border-r border-slate-200 bg-white">
           <SidebarHeader className="border-b border-slate-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="w-16 h-12 flex items-center justify-center">
-                <img
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68d9e928bbf1e5e27242f318/9419f63ae_bryantylogo.JPG"
-                  alt="Bryant Logging"
-                  className="w-full h-full object-contain"
-                />
+              <div className="w-16 h-12 flex items-center justify-center bg-slate-100 rounded">
+                <Wrench className="w-8 h-8 text-slate-600" />
               </div>
               <div>
                 <h2 className="font-bold text-slate-900 text-lg">Bryant Logging</h2>
@@ -500,12 +496,8 @@ const AppLayout = ({ children, currentPageName }) => {
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-slate-100 p-2 rounded-lg transition-colors duration-200" />
               <div className="flex items-center gap-3">
-                <div className="w-12 h-8 bg-slate-200 flex items-center justify-center">
-                  <img
-                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/68d9e928bbf1e5e27242f318/9419f63ae_bryantylogo.JPG"
-                    alt="Bryant Logging"
-                    className="w-full h-full object-contain"
-                  />
+                <div className="w-12 h-8 bg-slate-200 flex items-center justify-center rounded">
+                  <Wrench className="w-5 h-5 text-slate-600" />
                 </div>
                 <h1 className="text-xl font-bold text-slate-900">Bryant Logging</h1>
               </div>
