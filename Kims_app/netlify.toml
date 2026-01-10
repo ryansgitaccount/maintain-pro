@@ -1,7 +1,0 @@
-[build]
-  base = "Kims_app/draft_1/maintain-pro-7242f318"
-  command = "npm ci --legacy-peer-deps"
-  publish = "Kims_app/draft_1/maintain-pro-7242f318/dist"
-
-[build.environment]
-  NODE_VERSION = "20"
