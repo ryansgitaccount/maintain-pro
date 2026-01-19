@@ -755,10 +755,9 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                     }
 
                     await Machine.update(selectedMachine, updatePayload);
-                    await User.updateMyUserData({
-                        last_used_machine_id: selectedMachine,
-                        last_used_operator_name: operatorName,
-                    });
+                    // Store in localStorage instead
+                    localStorage.setItem('last_used_machine_id', selectedMachine);
+                    localStorage.setItem('last_used_operator_name', operatorName);
                     toast({
                         title: "Submission Logged",
                         description: "Checklist is identical to previous one. Machine hours updated, but no duplicate record was created.",
@@ -778,12 +777,10 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     }
 
 
-    // Save last used machine and operator for the user
+    // Save last used machine and operator to localStorage
     try {
-      await User.updateMyUserData({
-        last_used_machine_id: selectedMachine,
-        last_used_operator_name: operatorName,
-      });
+      localStorage.setItem('last_used_machine_id', selectedMachine);
+      localStorage.setItem('last_used_operator_name', operatorName);
     } catch (error) {
       console.warn("Could not save last used data:", error);
     }

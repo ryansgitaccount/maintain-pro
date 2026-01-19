@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { MaintenanceChecklist, Machine, MaintenanceRecord } from "@/api/entities";
-import { User } from "@/api/entities";
+import { supabase } from "@/api/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -83,7 +83,7 @@ export default function Checklists() {
   const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
-        const user = await User.me().catch(() => null); // Fetch user first to use their email
+        const { data: { user } } = await supabase.auth.getUser();
         setCurrentUser(user); // Set current user immediately
 
         const [checklistsData, machinesData, recordsData, atRiskIds] = await Promise.all([

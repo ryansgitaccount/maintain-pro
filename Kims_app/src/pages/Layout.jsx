@@ -6,8 +6,8 @@ import { createPageUrl } from "@/utils";
 import { MaintenanceRecord, ServiceCard } from "@/api/entities"; // Updated import
 import { Message } from "@/api/entities";
 import { Notification } from "@/api/entities";
-import { User } from "@/api/entities";
 import { UploadFile, InvokeLLM } from "@/api/integrations"; // Updated import
+import { supabase } from "@/api/supabaseClient";
 import { useAuth } from "@/context/AuthContext";
 import {
   Settings,
@@ -190,7 +190,7 @@ const AppLayout = ({ children, currentPageName }) => {
 
   const fetchMentionCount = useCallback(async () => {
     try {
-        const user = await User.me();
+        const { data: { user } } = await supabase.auth.getUser();
         if (user) {
             const unread = await Notification.filter({ notified_user_email: user.email, is_read: false });
             setMentionCount(unread.length);

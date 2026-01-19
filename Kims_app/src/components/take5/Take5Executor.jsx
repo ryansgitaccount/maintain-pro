@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { X, Save, AlertTriangle, ShieldCheck } from "lucide-react";
 import { Take5Record } from "@/api/entities";
 import { useToast } from "@/components/ui/useToast";
-import { User } from "@/api/entities";
+import { supabase } from "@/api/supabaseClient";
 
 const operatorNames = [
     "Aaron Marsh", "Adam Schultz", "Adrian Beevor", "Andrew Clarke", "Andrew Walker", "Andy Billingsley",
@@ -46,9 +46,11 @@ export default function Take5Executor({ onComplete, onCancel }) {
     useEffect(() => {
       const fetchUserAndSetOperator = async () => {
         try {
-          const user = await User.me();
-          if (user?.last_used_operator_name && operatorNames.includes(user.last_used_operator_name)) {
-            setOperatorName(user.last_used_operator_name);
+          const { data: { user } } = await supabase.auth.getUser();
+          // Store operator name in localStorage instead of user metadata
+          const lastUsedName = localStorage.getItem('last_used_operator_name');
+          if (lastUsedName && operatorNames.includes(lastUsedName)) {
+            setOperatorName(lastUsedName);
           }
         } catch(error) {
           console.warn("Could not fetch current user to pre-fill operator name:", error);
@@ -71,8 +73,8 @@ export default function Take5Executor({ onComplete, onCancel }) {
         }
 
         try {
-            // Save the currently selected operator name for future pre-filling
-            await User.updateMyUserData({ last_used_operator_name: operatorName });
+            // Save the currently selected operator name to localStorage for future pre-filling
+            localStorage.setItem('last_used_operator_name', operatorName);
         } catch (error) {
             console.warn("Could not save last used operator name:", error);
             // Non-critical error, continue with Take 5 record submission

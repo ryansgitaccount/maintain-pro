@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from "react";
-import { User } from "@/api/entities";
+import { supabase } from "@/api/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Users, Shield, Search, HardHat, Wrench, WifiOff, ShieldAlert } from "lucide-react";
@@ -22,16 +22,13 @@ export default function Employees() {
         setIsLoading(true);
         setError(null); // Clear previous errors
         try {
-            const user = await User.me(); // Fetch current user
+            const { data: { user } } = await supabase.auth.getUser();
             setCurrentUser(user);
 
-            if (user.role === 'admin') {
-                const data = await User.list();
-                setEmployees(data);
-            } else {
-                // If not an admin, show only their own card and a permission error for the list.
+            // For now, just show the current user
+            // In the future, you could add user metadata to check for admin role
+            if (user) {
                 setEmployees([user]); // Display only the current user
-                setError("You do not have permission to view the full employee list.");
             }
         } catch (err) {
             console.error("Failed to load employees:", err);

@@ -5,6 +5,7 @@ import { Notification } from "@/api/entities";
 import { User } from "@/api/entities";
 import { Machine } from "@/api/entities"; // Import Machine entity
 import { UploadFile, SendEmail, InvokeLLM } from "@/api/integrations";
+import { supabase } from "@/api/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -201,13 +202,11 @@ export default function MessageBoard() {
   useEffect(() => {
     const fetchUserAndMessages = async () => {
       try {
-        const [user, users, machines] = await Promise.all([
-            User.me(),
-            User.list(),
+        const { data: { user } } = await supabase.auth.getUser();
+        const [machines] = await Promise.all([
             Machine.list() // Fetch machines here
         ]);
         setCurrentUser(user);
-        setAllUsers(users);
         setAllMachines(machines); // Set machines state
         if (user) {
             markNotificationsAsRead(user.email);
