@@ -1,6 +1,19 @@
 import { supabase } from './supabaseClient';
 
 // ============================================================
+// UTILITY FUNCTION: Clean empty strings to null
+// ============================================================
+const cleanData = (data) => {
+  const cleaned = { ...data };
+  Object.keys(cleaned).forEach(key => {
+    if (cleaned[key] === '' || cleaned[key] === undefined) {
+      cleaned[key] = null;
+    }
+  });
+  return cleaned;
+};
+
+// ============================================================
 // MACHINES API
 // ============================================================
 export const Machine = {
@@ -34,9 +47,10 @@ export const Machine = {
   },
 
   async create(machineData) {
+    const cleaned = cleanData(machineData);
     const { data, error } = await supabase
       .from('machines')
-      .insert([machineData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -44,9 +58,10 @@ export const Machine = {
   },
 
   async update(id, machineData) {
+    const cleaned = cleanData(machineData);
     const { data, error } = await supabase
       .from('machines')
-      .update(machineData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
@@ -97,9 +112,10 @@ export const MaintenanceRecord = {
   },
 
   async create(recordData) {
+    const cleaned = cleanData(recordData);
     const { data, error } = await supabase
       .from('maintenance_records')
-      .insert([recordData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -107,9 +123,10 @@ export const MaintenanceRecord = {
   },
 
   async update(id, recordData) {
+    const cleaned = cleanData(recordData);
     const { data, error } = await supabase
       .from('maintenance_records')
-      .update(recordData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
@@ -160,9 +177,10 @@ export const MaintenanceChecklist = {
   },
 
   async create(checklistData) {
+    const cleaned = cleanData(checklistData);
     const { data, error } = await supabase
       .from('maintenance_checklists')
-      .insert([checklistData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -170,9 +188,10 @@ export const MaintenanceChecklist = {
   },
 
   async update(id, checklistData) {
+    const cleaned = cleanData(checklistData);
     const { data, error } = await supabase
       .from('maintenance_checklists')
-      .update(checklistData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
@@ -223,9 +242,10 @@ export const Message = {
   },
 
   async create(messageData) {
+    const cleaned = cleanData(messageData);
     const { data, error } = await supabase
       .from('messages')
-      .insert([messageData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -233,9 +253,10 @@ export const Message = {
   },
 
   async update(id, messageData) {
+    const cleaned = cleanData(messageData);
     const { data, error } = await supabase
       .from('messages')
-      .update(messageData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
@@ -286,9 +307,10 @@ export const Take5Record = {
   },
 
   async create(recordData) {
+    const cleaned = cleanData(recordData);
     const { data, error } = await supabase
       .from('take5_records')
-      .insert([recordData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -296,9 +318,10 @@ export const Take5Record = {
   },
 
   async update(id, recordData) {
+    const cleaned = cleanData(recordData);
     const { data, error } = await supabase
       .from('take5_records')
-      .update(recordData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
@@ -349,9 +372,10 @@ export const MaintenanceIssue = {
   },
 
   async create(issueData) {
+    const cleaned = cleanData(issueData);
     const { data, error } = await supabase
       .from('maintenance_issues')
-      .insert([issueData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -359,9 +383,10 @@ export const MaintenanceIssue = {
   },
 
   async update(id, issueData) {
+    const cleaned = cleanData(issueData);
     const { data, error } = await supabase
       .from('maintenance_issues')
-      .update(issueData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
@@ -412,9 +437,10 @@ export const WorkshopJobCard = {
   },
 
   async create(cardData) {
+    const cleaned = cleanData(cardData);
     const { data, error } = await supabase
       .from('workshop_job_cards')
-      .insert([cardData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -422,9 +448,10 @@ export const WorkshopJobCard = {
   },
 
   async update(id, cardData) {
+    const cleaned = cleanData(cardData);
     const { data, error } = await supabase
       .from('workshop_job_cards')
-      .update(cardData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
@@ -475,9 +502,10 @@ export const WorkshopInventory = {
   },
 
   async create(itemData) {
+    const cleaned = cleanData(itemData);
     const { data, error } = await supabase
       .from('workshop_inventory')
-      .insert([itemData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -485,9 +513,10 @@ export const WorkshopInventory = {
   },
 
   async update(id, itemData) {
+    const cleaned = cleanData(itemData);
     const { data, error } = await supabase
       .from('workshop_inventory')
-      .update(itemData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
@@ -538,9 +567,10 @@ export const Notification = {
   },
 
   async create(notificationData) {
+    const cleaned = cleanData(notificationData);
     const { data, error } = await supabase
       .from('notifications')
-      .insert([notificationData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -548,9 +578,10 @@ export const Notification = {
   },
 
   async update(id, notificationData) {
+    const cleaned = cleanData(notificationData);
     const { data, error } = await supabase
       .from('notifications')
-      .update(notificationData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
@@ -601,9 +632,10 @@ export const ServiceCard = {
   },
 
   async create(cardData) {
+    const cleaned = cleanData(cardData);
     const { data, error } = await supabase
       .from('service_cards')
-      .insert([cardData])
+      .insert([cleaned])
       .select()
       .single();
     if (error) throw error;
@@ -611,9 +643,10 @@ export const ServiceCard = {
   },
 
   async update(id, cardData) {
+    const cleaned = cleanData(cardData);
     const { data, error } = await supabase
       .from('service_cards')
-      .update(cardData)
+      .update(cleaned)
       .eq('id', id)
       .select()
       .single();
