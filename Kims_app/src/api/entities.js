@@ -16,6 +16,40 @@ const cleanData = (data) => {
 };
 
 // ============================================================
+// UTILITY FUNCTION: Get current user for RLS policies
+// ============================================================
+const getCurrentUser = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('User must be authenticated');
+  }
+  return user;
+};
+
+// ============================================================
+// UTILITY FUNCTION: Add user metadata to data
+// ============================================================
+const addUserMetadata = async (data) => {
+  const user = await getCurrentUser();
+  return {
+    ...data,
+    created_by: user.id,
+    updated_by: user.id
+  };
+};
+
+// ============================================================
+// UTILITY FUNCTION: Add update metadata to data
+// ============================================================
+const addUpdateMetadata = async (data) => {
+  const user = await getCurrentUser();
+  return {
+    ...data,
+    updated_by: user.id
+  };
+};
+
+// ============================================================
 // MACHINES API
 // ============================================================
 export const Machine = {
@@ -49,37 +83,42 @@ export const Machine = {
   },
 
   async create(machineData) {
-    const cleaned = cleanData(machineData);
-    console.log('Machine.create() called with cleaned data:', cleaned);
-    console.log('Supabase URL:', supabase.supabaseUrl);
     try {
+      const cleaned = cleanData(machineData);
+      const dataWithUser = await addUserMetadata(cleaned);
+      
+      console.log('Machine.create() with user ID:', dataWithUser.created_by);
+      
       const { data, error } = await supabase
         .from('machines')
-        .insert([cleaned])
+        .insert([dataWithUser])
         .select()
         .single();
-      if (error) {
-        console.error('Machine.create() error:', error);
-        throw error;
-      }
-      console.log('Machine.create() success:', data);
+      if (error) throw error;
       return data;
     } catch (err) {
-      console.error('Machine.create() caught error:', err);
+      console.error('Machine.create() error:', err);
       throw err;
     }
   },
 
   async update(id, machineData) {
-    const cleaned = cleanData(machineData);
-    const { data, error } = await supabase
-      .from('machines')
-      .update(cleaned)
-      .eq('id', id)
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(machineData);
+      const dataWithUser = await addUpdateMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('machines')
+        .update(dataWithUser)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('Machine.update() error:', err);
+      throw err;
+    }
   },
 
   async delete(id) {
@@ -125,26 +164,40 @@ export const MaintenanceRecord = {
   },
 
   async create(recordData) {
-    const cleaned = cleanData(recordData);
-    const { data, error } = await supabase
-      .from('maintenance_records')
-      .insert([cleaned])
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(recordData);
+      const dataWithUser = await addUserMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('maintenance_records')
+        .insert([dataWithUser])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('MaintenanceRecord.create() error:', err);
+      throw err;
+    }
   },
 
   async update(id, recordData) {
-    const cleaned = cleanData(recordData);
-    const { data, error } = await supabase
-      .from('maintenance_records')
-      .update(cleaned)
-      .eq('id', id)
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(recordData);
+      const dataWithUser = await addUpdateMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('maintenance_records')
+        .update(dataWithUser)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('MaintenanceRecord.update() error:', err);
+      throw err;
+    }
   },
 
   async delete(id) {
@@ -385,26 +438,40 @@ export const MaintenanceIssue = {
   },
 
   async create(issueData) {
-    const cleaned = cleanData(issueData);
-    const { data, error } = await supabase
-      .from('maintenance_issues')
-      .insert([cleaned])
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(issueData);
+      const dataWithUser = await addUserMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('maintenance_issues')
+        .insert([dataWithUser])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('MaintenanceIssue.create() error:', err);
+      throw err;
+    }
   },
 
   async update(id, issueData) {
-    const cleaned = cleanData(issueData);
-    const { data, error } = await supabase
-      .from('maintenance_issues')
-      .update(cleaned)
-      .eq('id', id)
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(issueData);
+      const dataWithUser = await addUpdateMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('maintenance_issues')
+        .update(dataWithUser)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('MaintenanceIssue.update() error:', err);
+      throw err;
+    }
   },
 
   async delete(id) {
@@ -450,26 +517,40 @@ export const WorkshopJobCard = {
   },
 
   async create(cardData) {
-    const cleaned = cleanData(cardData);
-    const { data, error } = await supabase
-      .from('workshop_job_cards')
-      .insert([cleaned])
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(cardData);
+      const dataWithUser = await addUserMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('workshop_job_cards')
+        .insert([dataWithUser])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('WorkshopJobCard.create() error:', err);
+      throw err;
+    }
   },
 
   async update(id, cardData) {
-    const cleaned = cleanData(cardData);
-    const { data, error } = await supabase
-      .from('workshop_job_cards')
-      .update(cleaned)
-      .eq('id', id)
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(cardData);
+      const dataWithUser = await addUpdateMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('workshop_job_cards')
+        .update(dataWithUser)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('WorkshopJobCard.update() error:', err);
+      throw err;
+    }
   },
 
   async delete(id) {
@@ -515,26 +596,40 @@ export const WorkshopInventory = {
   },
 
   async create(itemData) {
-    const cleaned = cleanData(itemData);
-    const { data, error } = await supabase
-      .from('workshop_inventory')
-      .insert([cleaned])
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(itemData);
+      const dataWithUser = await addUserMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('workshop_inventory')
+        .insert([dataWithUser])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('WorkshopInventory.create() error:', err);
+      throw err;
+    }
   },
 
   async update(id, itemData) {
-    const cleaned = cleanData(itemData);
-    const { data, error } = await supabase
-      .from('workshop_inventory')
-      .update(cleaned)
-      .eq('id', id)
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(itemData);
+      const dataWithUser = await addUpdateMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('workshop_inventory')
+        .update(dataWithUser)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('WorkshopInventory.update() error:', err);
+      throw err;
+    }
   },
 
   async delete(id) {
@@ -645,26 +740,40 @@ export const ServiceCard = {
   },
 
   async create(cardData) {
-    const cleaned = cleanData(cardData);
-    const { data, error } = await supabase
-      .from('service_cards')
-      .insert([cleaned])
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(cardData);
+      const dataWithUser = await addUserMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('service_cards')
+        .insert([dataWithUser])
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('ServiceCard.create() error:', err);
+      throw err;
+    }
   },
 
   async update(id, cardData) {
-    const cleaned = cleanData(cardData);
-    const { data, error } = await supabase
-      .from('service_cards')
-      .update(cleaned)
-      .eq('id', id)
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    try {
+      const cleaned = cleanData(cardData);
+      const dataWithUser = await addUpdateMetadata(cleaned);
+      
+      const { data, error } = await supabase
+        .from('service_cards')
+        .update(dataWithUser)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('ServiceCard.update() error:', err);
+      throw err;
+    }
   },
 
   async delete(id) {
