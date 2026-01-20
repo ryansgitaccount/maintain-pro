@@ -230,33 +230,68 @@ CREATE POLICY "Enable read access for authenticated users" ON notifications
 
 -- Allow authenticated users to insert/update their own data
 CREATE POLICY "Enable insert for authenticated users" ON machines
-  FOR INSERT WITH CHECK (auth.uid() = created_by OR created_by IS NULL);
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
 
 CREATE POLICY "Enable update for authenticated users" ON machines
-  FOR UPDATE USING (auth.uid() = created_by OR created_by IS NULL);
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
 
 CREATE POLICY "Enable insert for authenticated users" ON maintenance_records
-  FOR INSERT WITH CHECK (auth.uid() = created_by OR created_by IS NULL);
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
 
 CREATE POLICY "Enable update for authenticated users" ON maintenance_records
-  FOR UPDATE USING (auth.uid() = created_by OR created_by IS NULL);
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
 
 CREATE POLICY "Enable insert for authenticated users" ON maintenance_issues
-  FOR INSERT WITH CHECK (auth.uid() = created_by OR created_by IS NULL);
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
 
 CREATE POLICY "Enable update for authenticated users" ON maintenance_issues
-  FOR UPDATE USING (auth.uid() = created_by OR created_by IS NULL);
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
 
 CREATE POLICY "Enable insert for authenticated users" ON workshop_job_cards
-  FOR INSERT WITH CHECK (auth.uid() = created_by OR created_by IS NULL);
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
 
 CREATE POLICY "Enable update for authenticated users" ON workshop_job_cards
-  FOR UPDATE USING (auth.uid() = created_by OR created_by IS NULL);
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable insert for authenticated users" ON maintenance_checklists
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable update for authenticated users" ON maintenance_checklists
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable insert for authenticated users" ON messages
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable update for authenticated users" ON messages
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable insert for authenticated users" ON take5_records
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable update for authenticated users" ON take5_records
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable insert for authenticated users" ON workshop_inventory
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable update for authenticated users" ON workshop_inventory
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable insert for authenticated users" ON service_cards
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable update for authenticated users" ON service_cards
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable insert for authenticated users" ON notifications
+  FOR INSERT WITH CHECK (auth.role() = 'authenticated_user');
+
+CREATE POLICY "Enable update for authenticated users" ON notifications
+  FOR UPDATE USING (auth.uid() = created_by OR auth.role() = 'authenticated_user');
 
 -- ============================================================
 -- STORAGE BUCKETS FOR FILE UPLOADS
 -- ============================================================
--- Create storage buckets via Supabase dashboard:
 -- 1. Create bucket: "files" (public)
 -- 2. Create bucket: "private-files" (private)
 -- Then set CORS policy to allow your domain
