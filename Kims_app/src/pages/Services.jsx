@@ -25,7 +25,7 @@ export default function Services() {
     setIsLoading(true);
     try {
         const [machineData, cardData] = await Promise.all([
-            Machine.list('-updated_date'),
+            Machine.list('-updated_at'),
             ServiceCard.list('-service_date'),
         ]);
         setMachines(machineData);

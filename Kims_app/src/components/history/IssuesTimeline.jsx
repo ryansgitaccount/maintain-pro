@@ -40,7 +40,7 @@ export default function IssuesTimeline({ issues, machines }) {
 
     // Process data for the line chart
     const data = _.chain(issues)
-        .groupBy(issue => format(parseISO(issue.resolved_at), 'yyyy-MM-dd'))
+        .groupBy(issue => format(parseISO(issue.resolved_date), 'yyyy-MM-dd'))
         .map((groupedIssues, date) => ({
             date: format(parseISO(date), 'MMM d'),
             fullDate: date,

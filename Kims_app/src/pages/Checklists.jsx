@@ -87,7 +87,7 @@ export default function Checklists() {
         setCurrentUser(user); // Set current user immediately
 
         const [checklistsData, machinesData, recordsData, atRiskIds] = await Promise.all([
-          MaintenanceChecklist.list('-updated_date'),
+          MaintenanceChecklist.list('-updated_at'),
           Machine.list('-plant_id'),
           // Filter records by the current user's email if available for improved performance
           MaintenanceRecord.filter({ created_by: user?.email }, "-created_date", 100),
@@ -141,8 +141,8 @@ export default function Checklists() {
       ...checklist,
       name: `Copy of ${checklist.name}`,
       id: undefined, // Ensure new ID is generated
-      created_date: undefined, // Clear creation date
-      updated_date: undefined, // Clear update date
+      created_at: undefined, // Clear creation date
+      updated_at: undefined, // Clear update date
       created_by: undefined // Clear creator, will be set on save
     };
 

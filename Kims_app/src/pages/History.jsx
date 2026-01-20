@@ -58,7 +58,7 @@ const RecordCard = ({ record, machinePlantId }) => {
       <CardContent className="space-y-3">
         <div className="flex items-center gap-2 text-sm text-slate-600">
           <Calendar className="w-4 h-4" />
-          <span>{format(parseISO(record.completed_at || record.created_date), 'MMM d, yyyy, h:mm a')}</span>
+          <span>{format(parseISO(record.completed_at || record.created_at), 'MMM d, yyyy, h:mm a')}</span>
         </div>
         {record.cost > 0 && (
             <div className="flex items-center gap-2 text-sm text-slate-600">
@@ -101,10 +101,10 @@ const ResolvedIssueCard = ({ issue, machine }) => {
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {issue.resolved_at && (
+        {issue.resolved_date && (
           <div className="flex items-center gap-2 text-sm text-slate-600">
             <Calendar className="w-4 h-4" />
-            <span>Resolved on {format(parseISO(issue.resolved_at), 'MMM d, yyyy')}</span>
+            <span>Resolved on {format(parseISO(issue.resolved_date), 'MMM d, yyyy')}</span>
           </div>
         )}
         {issue.assigned_to && (
@@ -204,13 +204,13 @@ export default function HistoryPage() {
   const loadData = async () => {
     setIsLoading(true);
     const [recordsData, machinesData, issuesData] = await Promise.all([
-      MaintenanceRecord.list('-created_date'),
+      MaintenanceRecord.list('-created_at'),
       Machine.list(),
-      MaintenanceIssue.list('-resolved_at')
+      MaintenanceIssue.list('-resolved_date')
     ]);
     setRecords(recordsData);
     setMachines(machinesData);
-    setIssues(issuesData.filter(i => i.status === 'resolved' && i.resolved_at)); // Ensure issues are resolved and have a date
+    setIssues(issuesData.filter(i => i.status === 'resolved' && i.resolved_date)); // Ensure issues are resolved and have a date
     setIsLoading(false);
   };
 

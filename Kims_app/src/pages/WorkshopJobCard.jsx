@@ -58,7 +58,7 @@ export default function WorkshopJobCardPage() {
     const loadData = async () => {
         setIsLoading(true);
         const [cardsData, machinesData] = await Promise.all([
-            WorkshopJobCard.list('-created_date'),
+            WorkshopJobCard.list('-created_at'),
             Machine.list()
         ]);
         setJobCards(cardsData);

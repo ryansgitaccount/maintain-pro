@@ -52,7 +52,7 @@ export default function MaintenanceHubPage() {
         const [issuesData, machinesData, recordsData] = await Promise.all([
             MaintenanceIssue.list('-created_date', 500), // Limit to recent 500 issues for performance
             Machine.list(),
-            MaintenanceRecord.list('-created_date', 1000) // Fetch records to find crew names
+            MaintenanceRecord.list('-created_at', 1000) // Fetch records to find crew names
         ]);
         setIssues(issuesData);
         setMachines(machinesData);

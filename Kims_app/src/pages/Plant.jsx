@@ -130,7 +130,7 @@ export default function PlantPage() {
   const loadData = async () => {
     setIsLoading(true);
     const [machinesData, recordsData, jobCardsData] = await Promise.all([
-        Machine.list('-updated_date'),
+        Machine.list('-updated_at'),
         MaintenanceRecord.list('-completed_at', 500), 
         WorkshopJobCard.list('-date_reported', 500)
     ]);

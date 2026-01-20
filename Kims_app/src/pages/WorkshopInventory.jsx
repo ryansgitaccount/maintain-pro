@@ -28,7 +28,7 @@ export default function WorkshopInventoryPage() {
         setIsLoading(true);
         try {
             const [items, machinesData] = await Promise.all([
-                WorkshopInventory.list('-updated_date'),
+                WorkshopInventory.list('-updated_at'),
                 Machine.list()
             ]);
             setInventory(items);

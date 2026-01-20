@@ -119,7 +119,7 @@ const MessageItem = ({ message, isCurrentUser }) => {
         )}
         <div className={`flex items-center gap-2 mt-2 opacity-70`}>
           <p className="text-xs">
-            {message.created_date ? format(parseISO(message.created_date), 'MMM d, h:mm a') : 'Sending...'}
+            {message.created_at ? format(parseISO(message.created_at), 'MMM d, h:mm a') : 'Sending...'}
           </p>
           {message.isPending && <Clock className="w-3 h-3" title="Pending sync" />}
         </div>
@@ -164,7 +164,7 @@ export default function MessageBoard() {
   const loadMessages = useCallback(async () => {
     setIsLoading(true);
     try {
-      const serverMessages = await Message.list('-created_date', 200);
+      const serverMessages = await Message.list('-created_at', 200);
       const pendingMessages = JSON.parse(localStorage.getItem('pendingMessages') || '[]');
       
       const combined = [...pendingMessages, ...serverMessages];
@@ -172,8 +172,8 @@ export default function MessageBoard() {
           .map(id => combined.find(m => (m.id || m.localId) === id));
 
       const sorted = uniqueMessages.sort((a, b) => {
-        const dateA = a.created_date ? parseISO(a.created_date) : new Date(0); // Use epoch for unsent messages for sorting
-        const dateB = b.created_date ? parseISO(b.created_date) : new Date(0);
+        const dateA = a.created_at ? parseISO(a.created_at) : new Date(0); // Use epoch for unsent messages for sorting
+        const dateB = b.created_at ? parseISO(b.created_at) : new Date(0);
         return dateA.getTime() - dateB.getTime();
       });
       
