@@ -1,5 +1,7 @@
 import { supabase } from './supabaseClient';
 
+console.log('entities.js loaded, supabase client available:', !!supabase);
+
 // ============================================================
 // UTILITY FUNCTION: Clean empty strings to null
 // ============================================================
@@ -48,13 +50,24 @@ export const Machine = {
 
   async create(machineData) {
     const cleaned = cleanData(machineData);
-    const { data, error } = await supabase
-      .from('machines')
-      .insert([cleaned])
-      .select()
-      .single();
-    if (error) throw error;
-    return data;
+    console.log('Machine.create() called with cleaned data:', cleaned);
+    console.log('Supabase URL:', supabase.supabaseUrl);
+    try {
+      const { data, error } = await supabase
+        .from('machines')
+        .insert([cleaned])
+        .select()
+        .single();
+      if (error) {
+        console.error('Machine.create() error:', error);
+        throw error;
+      }
+      console.log('Machine.create() success:', data);
+      return data;
+    } catch (err) {
+      console.error('Machine.create() caught error:', err);
+      throw err;
+    }
   },
 
   async update(id, machineData) {
