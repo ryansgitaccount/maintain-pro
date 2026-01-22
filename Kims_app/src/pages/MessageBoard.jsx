@@ -605,7 +605,7 @@ export default function MessageBoard() {
           <div className="flex items-start gap-3">
             <Avatar className="w-10 h-10">
               <AvatarFallback className="bg-slate-200 text-slate-700">
-                {currentUser ? currentUser.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : <UserIcon size={20} />}
+                {currentUser && currentUser.full_name ? currentUser.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : <UserIcon size={20} />}
               </AvatarFallback>
             </Avatar>
             <Popover open={mentionQuery !== null && (filteredMentionUsers.length > 0 || filteredMentionMachines.length > 0)} onOpenChange={(open) => { if (!open) setMentionQuery(null); }}>
@@ -752,7 +752,7 @@ export default function MessageBoard() {
                                 >
                                     <Avatar className="w-8 h-8">
                                         <AvatarFallback className="bg-slate-200 text-slate-700 text-xs">
-                                            {user.full_name.split(' ').map(n=>n[0]).join('').toUpperCase()}
+                                            {user.full_name ? user.full_name.split(' ').map(n=>n[0]).join('').toUpperCase() : '?'}
                                         </AvatarFallback>
                                     </Avatar>
                                     <span className="font-medium text-sm text-slate-800">{user.full_name}</span>

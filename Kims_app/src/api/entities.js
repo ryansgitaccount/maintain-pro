@@ -50,6 +50,26 @@ const addUpdateMetadata = async (data) => {
 };
 
 // ============================================================
+// UTILITY FUNCTION: Generic filter for any entity
+// ============================================================
+const createFilterMethod = (tableName) => {
+  return async (filters = {}) => {
+    let query = supabase.from(tableName).select('*');
+    
+    // Add filters
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== undefined && filters[key] !== null) {
+        query = query.eq(key, filters[key]);
+      }
+    });
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  };
+};
+
+// ============================================================
 // MACHINES API
 // ============================================================
 export const Machine = {
@@ -128,6 +148,8 @@ export const Machine = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('machines'),
 };
 
 // ============================================================
@@ -207,6 +229,8 @@ export const MaintenanceRecord = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('maintenance_records'),
 };
 
 // ============================================================
@@ -272,6 +296,8 @@ export const MaintenanceChecklist = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('maintenance_checklists'),
 };
 
 // ============================================================
@@ -337,6 +363,8 @@ export const Message = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('messages'),
 };
 
 // ============================================================
@@ -402,6 +430,8 @@ export const Take5Record = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('take5_records'),
 };
 
 // ============================================================
@@ -481,6 +511,8 @@ export const MaintenanceIssue = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('maintenance_issues'),
 };
 
 // ============================================================
@@ -560,6 +592,8 @@ export const WorkshopJobCard = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('workshop_job_cards'),
 };
 
 // ============================================================
@@ -639,6 +673,8 @@ export const WorkshopInventory = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('workshop_inventory'),
 };
 
 // ============================================================
@@ -704,6 +740,8 @@ export const Notification = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('notifications'),
 };
 
 // ============================================================
@@ -783,6 +821,8 @@ export const ServiceCard = {
       .eq('id', id);
     if (error) throw error;
   },
+
+  filter: createFilterMethod('service_cards'),
 };
 
 // ============================================================
