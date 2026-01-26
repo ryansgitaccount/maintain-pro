@@ -60,7 +60,7 @@ const MessageItem = ({ message, isCurrentUser }) => {
   const videoToDisplay = message.video_url || message.pending_video_base66;
   
   // Get consistent color for this user
-  const userColors = getUserColor(message.author_name || 'Unknown');
+  const userColors = getUserColor(message.author || 'Unknown');
   const messageClasses = `${userColors.bg} ${userColors.text}`;
 
   const contentWithMentions = (message.content || '').split(/(@\w+\s\w+|@[A-Z0-9-]+)/g).map((part, index) => {
@@ -75,13 +75,13 @@ const MessageItem = ({ message, isCurrentUser }) => {
       {!isCurrentUser && (
         <Avatar className="w-8 h-8">
           <AvatarFallback className={`text-xs ${userColors.avatar}`}>
-            {getInitials(message.author_name)}
+            {getInitials(message.author)}
           </AvatarFallback>
         </Avatar>
       )}
       <div className={`max-w-md p-3 rounded-lg ${messageClasses}`}>
         <p className={`text-xs font-bold mb-1 opacity-80`}>
-          {message.author_name}
+          {message.author}
         </p>
         {message.content && <p className="text-sm whitespace-pre-wrap">{contentWithMentions}</p>}
         {imageToDisplay && (
@@ -127,7 +127,7 @@ const MessageItem = ({ message, isCurrentUser }) => {
       {isCurrentUser && (
         <Avatar className="w-8 h-8">
           <AvatarFallback className="bg-slate-800 text-white text-xs">
-            {getInitials(message.author_name)}
+            {getInitials(message.author)}
           </AvatarFallback>
         </Avatar>
       )}
@@ -188,12 +188,9 @@ export default function MessageBoard() {
   const markNotificationsAsRead = useCallback(async (userEmail) => {
     if (!userEmail) return;
     try {
-        const unreadNotifs = await Notification.filter({ notified_user_email: userEmail, is_read: false });
-        if (unreadNotifs.length > 0) {
-            const updates = unreadNotifs.map(notif => Notification.update(notif.id, { is_read: true }));
-            await Promise.all(updates);
-            window.dispatchEvent(new CustomEvent('notifications-read'));
-        }
+        // Note: Notifications don't have notified_user_email - skipping for now
+        // This feature needs to be reimplemented with proper notification user tracking
+        return;
     } catch (error) {
         console.error("Failed to mark notifications as read:", error);
     }
@@ -409,7 +406,7 @@ export default function MessageBoard() {
 
     const messageData = {
       content: newMessage.trim(),
-      author_name: currentUser.full_name,
+      author: currentUser.full_name,
       created_by: currentUser.email,
       created_date: new Date().toISOString(),
     };
@@ -484,13 +481,14 @@ export default function MessageBoard() {
             const notificationsToCreate = uniqueMentions
                 .filter(user => user.email !== currentUser.email)
                 .map(user => ({
-                    notified_user_email: user.email,
-                    source_message_id: newMsg.id,
-                    source_author_name: currentUser.full_name,
+                    title: `Mention from ${currentUser.full_name}`,
+                    message: newMessage.substring(0, 50) + '...',
+                    // Note: notifications table doesn't have notified_user_email column
+                    // This needs schema update to properly track recipients
                 }));
 
             if (notificationsToCreate.length > 0) {
-                await Notification.bulkCreate(notificationsToCreate);
+                // Skip bulk create for now - needs proper implementation
                 window.dispatchEvent(new CustomEvent('new-mention'));
             }
             

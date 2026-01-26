@@ -192,8 +192,8 @@ const AppLayout = ({ children, currentPageName }) => {
     try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-            const unread = await Notification.filter({ notified_user_email: user.email, is_read: false });
-            setMentionCount(unread.length);
+            // Note: Notifications don't have notified_user_email - this feature needs reimplementation
+            setMentionCount(0);
         }
     } catch (e) {
         // Not logged in or error, so count is 0
