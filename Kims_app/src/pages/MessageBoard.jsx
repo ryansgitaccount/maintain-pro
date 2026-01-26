@@ -407,7 +407,7 @@ export default function MessageBoard() {
     const messageData = {
       content: newMessage.trim(),
       author: currentUser.full_name,
-      created_by: currentUser.email,
+      created_by: currentUser.id,
       // created_at is automatically set by the database
     };
 
