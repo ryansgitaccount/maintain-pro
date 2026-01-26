@@ -408,7 +408,7 @@ export default function MessageBoard() {
       content: newMessage.trim(),
       author: currentUser.full_name,
       created_by: currentUser.email,
-      created_date: new Date().toISOString(),
+      // created_at is automatically set by the database
     };
 
     // Attempt to upload files only if online
