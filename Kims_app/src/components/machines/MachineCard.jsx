@@ -65,6 +65,12 @@ export default function MachineCard({ machine, onEdit, onDelete, onCreateService
             </CardTitle>
             <p className="text-sm text-slate-600 mt-1">{machine.model}</p>
             <p className="text-xs text-slate-500">{machine.manufacturer}</p>
+            {machine.year && (
+              <p className="text-xs text-slate-500">Year: {machine.year}</p>
+            )}
+            {machine.attachment && (
+              <p className="text-xs text-slate-500">Attachment: {machine.attachment}</p>
+            )}
           </div>
           <div className="flex gap-1 ml-2 no-print"> {/* Added no-print class */}
             <Button

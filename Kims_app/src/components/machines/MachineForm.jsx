@@ -14,6 +14,8 @@ export default function MachineForm({ machine, onSubmit, onCancel }) {
     model: "",
     manufacturer: "",
     serial_number: "",
+    year: "",
+    attachment: "",
     status: "operational",
     crew_name: "",
     last_service_date: "",
@@ -61,6 +63,7 @@ export default function MachineForm({ machine, onSubmit, onCancel }) {
     
     const dataToSubmit = {
       ...finalFormData,
+      year: finalFormData.year === '' || isNaN(parseInt(finalFormData.year, 10)) ? null : parseInt(finalFormData.year, 10),
       last_service_hours: finalFormData.last_service_hours === '' || isNaN(parseInt(finalFormData.last_service_hours, 10)) ? null : parseInt(finalFormData.last_service_hours, 10),
       current_operating_hours: finalFormData.current_operating_hours === '' || isNaN(parseInt(finalFormData.current_operating_hours, 10)) ? 0 : parseInt(finalFormData.current_operating_hours, 10),
       service_interval_hours: finalFormData.service_interval_hours === '' || isNaN(parseInt(finalFormData.service_interval_hours, 10)) ? 200 : parseInt(finalFormData.service_interval_hours, 10)
@@ -122,6 +125,27 @@ export default function MachineForm({ machine, onSubmit, onCancel }) {
                 value={formData.serial_number}
                 onChange={(e) => handleInputChange('serial_number', e.target.value)}
                 placeholder="e.g., SN123456789"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="year">Year</Label>
+              <Input
+                id="year"
+                type="number"
+                min="1900"
+                max={new Date().getFullYear()}
+                value={formData.year || ''}
+                onChange={(e) => handleInputChange('year', e.target.value ? parseInt(e.target.value) : '')}
+                placeholder="e.g., 2020"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="attachment">Attachment</Label>
+              <Input
+                id="attachment"
+                value={formData.attachment || ''}
+                onChange={(e) => handleInputChange('attachment', e.target.value)}
+                placeholder="e.g., Grapple, Forks"
               />
             </div>
           </div>

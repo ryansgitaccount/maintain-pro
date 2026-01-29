@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { validateMachineData, cleanMachineData } from '../utils/csvParser';
 
 console.log('entities.js loaded, supabase client available:', !!supabase);
 
@@ -147,6 +148,59 @@ export const Machine = {
       .delete()
       .eq('id', id);
     if (error) throw error;
+  },
+
+  async batchImport(machines) {
+    // Validate and clean each machine record
+    const results = {
+      success: [],
+      failed: [],
+      total: machines.length,
+    };
+
+    const processedMachines = [];
+
+    for (let i = 0; i < machines.length; i++) {
+      const machine = machines[i];
+      try {
+        // Validate the machine data
+        const validation = validateMachineData(machine);
+        if (!validation.valid) {
+          results.failed.push({
+            index: i,
+            data: machine,
+            error: validation.errors.join(', '),
+          });
+          continue;
+        }
+
+        // Clean the machine data
+        const cleaned = cleanMachineData(machine);
+        const dataWithUser = await addUserMetadata(cleaned);
+        processedMachines.push(dataWithUser);
+        results.success.push({ index: i, data: machine });
+      } catch (err) {
+        results.failed.push({
+          index: i,
+          data: machine,
+          error: err.message,
+        });
+      }
+    }
+
+    // Batch insert all valid records
+    if (processedMachines.length > 0) {
+      const { error } = await supabase
+        .from('machines')
+        .insert(processedMachines);
+      
+      if (error) {
+        // If batch insert fails, mark all as failed
+        throw new Error(`Batch insert failed: ${error.message}`);
+      }
+    }
+
+    return results;
   },
 
   filter: createFilterMethod('machines'),

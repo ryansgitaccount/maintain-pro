@@ -1,0 +1,139 @@
+plant_id,model,year,manufacturer,serial_number,status,crew_name,attachment
+L90-1,Volvo L90F - Wrecked,2007,Volvo,L90FV25329,Terminated,Hiwipango,Fieldchief Forks
+938H-1,CAT 938H-1,2010,CAT,CAT0938HCMCC00226,Terminated,N/A,Fieldchief Forks
+938H-2,CAT 938H-2,2010,CAT,CAT0938HHMCC00362,Terminated,Viking,Fieldchief Forks
+938K-1,CAT 938K (Craig),2014,CAT,CAT0938KCSWL03384,Terminated,Boar,Fieldchief Forks
+938K-2,CAT 938K (was stag) - (Bollicks),2013,CAT,CAT0938KJSWL01401,Terminated,Bryant,Fieldchief Forks
+624K-1,624K Loader (Wick) - (Bollicks) - Sold May 2023,2013,John Deere,1DW624KPCDC657166,Terminated,NBL765,null
+624K-2,624k Loader (dal),2019,John Deere,1BZ624KATJC001281,Active,BBC,null
+624K-3,624K John Deer Loader - (Bollicks),2018,John Deere,1DW624KPVHC684270,Active,Chamois,null
+624K-4,624K John Deer Loader,2020,John Deere,1BZ624KAAKC001341,Active,Chamois,null
+L90H-2,Volvo L90H,2021,Volvo,L90HL00017665,Active,Bryant,null
+938K-3,CAT 938K,2022,CAT,CAT0938KHREP00946,Active,Bull,Fieldchief forks
+325C-1,CAT 325C,2002,CAT,CAT0325CKBMM00299,Active,Bryant,Ensign Grapple
+3329-1,Volvo FC33290C Grapple excavator,2010,Volvo,VCEF3329E00110007,Active,Chamois,Waratah 624 Super
+290-7,Hyundai 290-7,2007,Hyundai,N80811869,Active,Hiwipango,Satco Grapple + Buckets
+210-7,Hyundai 210-7,2006,Hyundai,N60713950,Active,BSW10,Satco Grapple + Buckets
+330-1,CAT 330CL (Tailhold),2002,CAT,CAT0330CTKDD00223,Terminated,BOAR,Back line
+336-1,CAT 336DL-1 Waratah 626-2 (Adam S),2010,Waratah,CAT0336DCWRK00251,Active,Bull,Waratah 626 Bigwood
+626-2,CAT 336DL-1 Waratah 626-2 (Adam S),2010,Waratah,WA626XX000176,Active,Bull,null
+350-5,Hitachi ZX350L-5 Waratah 625c-1 (Bryan Fisher),2013,Hitachi,HCMDDE93J00040763,Active,BBC,Waratah 625c
+625c-1,Hitachi ZX350L-5 Waratah 625c-1 (Bryan Fisher),2013,Hitachi,1WA625CXED0000030,Active,BBC,null
+400-1,Kobelco (guyline),0,Kobelco,LS-00624,Active,BULL,Guy Machine 123
+290-9,Hyundai 290-9 Waratah 622-1,0,Hyundai,HHKHZ801JD0001930,Active,BGB,null
+290-9,Waratah HTH622C 4x4,0,Waratah,1WA622CXEE0000061,Active,BGB,null
+250-9,Hyundai 250-9,2012,Hyundai,HHKHZ701KC0000333,Active,Chamois,Ensign Grapple + Bucket
+290-5,Hitachi ZX290L-5,2014,Hitachi,HCMDDF92T00040142,Active,Boar,Trinder Grapple + Bucket
+PC300-8,Komatsu PC300 (TA-1) (DC WA14),2007,Komatsu,KMTPC191L02060295,Active,BOAR,Traction Assist
+250-7,Hyundai 250-7,2007,Hyundai,N70211589,Active,Boar,Satco Grapple + Bucket
+336-2,Cat 336D-2 Waratah 626-3 (Scotty) - (Bollicks),2010,Waratah,CAT0336DTWRK00252,Active,Chamois,Waratah (626c)
+336-2,Cat 336D-2 Waratah 626-3 (Scotty) - (Bollicks),2010,Waratah,S/No 10998,Active,Chamois,null
+290-7/2,290-7 / 2 (TA-2) WA024,2006,Hitachi,N80811829,Active,Bull,null
+630-4,Satco Falling Head,0,Satco,null,Terminated,Bull,Satco 630 Felling Head
+552-1,CAT 552 Tilt F/M 630-4 (Tim),0,CAT,null,Terminated,NBL765,null
+320-1,Cat 320D (Charlie),2007,CAT,CAT0320DADHK01013,Active,Workshop,null
+380-1,Volvo 380-1 Waratah 626-4 - (Bollicks),2014,Waratah,VCE380DP00270173,Active,BBC,Waratah 626 Bigwood
+380-1,Volvo 380-1 Waratah 626-4 - (Bollicks),2014,Waratah,null,Active,BBC,null
+909-1,John Deer Tilt F/M 630-5 (Steve),2017,John Deere,1T0909MHPHC309079,Active,L9,Satco 630 Electric over Hyd S/N 26110
+630-5,John Deer Tilt F/M 630-5 (Steve),0,John Deere,S/N 26110,Active,L9,null
+380-2,Volvo 380-2 Waratah 626-1 (Jared),2012,Waratah,VCEC380DK00271017,Active,L9,null
+626-1,626-1 Waratah (DO NOT USE FROM 21/06/2022) (Spare Waratah) (Scrapped),2012,Waratah,234086,Terminated,Workshop,null
+626-5,626-5 Waratah EX Moutere,null,Waratah,null,Active,L9,null
+220-1,Volvo EC220 - 1 (Ben),0,Volvo,VCE220DJ00270404,Active,Boar,null
+220-2,Volvo EC220 - 2 (Ruffy),2017,Volvo,VCEC220DL00270814,Active,Stag,null
+250-1,Volvo EC250-1,2018,Volvo,VCEC250DK00270886,Active,LC1,null
+959-1,JD 959K F/M 630E-6 (Andy),2018,John Deere,1T0959MHVJC326624,Active,Bryant,null
+300-1,Volvo 300-1 (Jonny Musson),0,Volvo,VCEC300DL00271348,Active,Viking,null
+280-5,280-5 (TA-3) WA61,2018,Hitachi,HCMDDF91K00040376,Active,BOAR,null
+250-2,Volvo 250-2,2018,Volvo,VCEC250DJ00270940,Active,Boar,null
+300-2,Volvo EC300-2 HTH624C 624-2 Waratah (Jarod) - (Bollicks),2018,Waratah,VCEC300DL00271438,Active,BSW10,624C 1WA624CXLJ0000466
+220-3,EC220-3 Volvo (Grant Thompson),2018,Volvo,VCEC220DL00270991,Active,Bull,null
+280-5/2,ZX280-5/2 TA-4 WA65 (Nige's),0,Hitachi,HCMDDF91C00040387,Active,BSW10,null
+855-1,Tiger Cat (F/M) LH855C - Jarod Hodges (Pinky),2014,Tigercat,85581144,Active,Chamois,null
+DX300,Doosan DX300 (Nic),null,Doosan,DWGCECABHJ1010037,Active,Chamois,null
+280-5/3,ZX280-5/3 TA-5 WA70,null,Hitachi,HCMDDF91V00040396,Active,L9,Winch assist S/N WA070
+855-2,Tigercat 855E Harvester F/M (Jayden R),2019,Tigercat,85583255,Active,Boar,null
+300-4,EC300DL F/M 630-2 (Zac),2019,Volvo,VCEC300DV00271766,Active,BSW10,630-1
+630-1,EC300DL F/M 630-2 (Zac),2020,Volvo,null,Active,BSW10,null
+300-5,EC300DL-5 Shovel Excavator,2019,Volvo,VCE300DA00271607,Active,BBC,Trinder Grapple T17 003
+210-7/2,210-7 Hyundai Ensign grapple excavator and bucket - (Bollicks),2008,Hyundai,N60717543,Active,Bryant,null
+330-2,CAT330C TA-6 EMS Traction assist twin rope,2005,CAT,CAT0330CTKDD01169,Terminated,Chamois,null
+3329-2,FC3329 Volvo Waratah (Bevan B) - (Bollicks),2012,Waratah,VCEF3329H00110023,Active,NBL765,Waratah super head
+624-3,FC3329 Volvo Waratah (Bevan B) - (Bollicks),null,Waratah,null,Active,NBL765,Waratah super head 624
+290-5/2,ZX290L-5G Hitchi Falling machine F/M Satco 630-8 - (Bollicks),2014,Hitachi,HCMDDF92E00040137,Active,STAG,Ensign 1700 grapple / Satco 630 falling head
+290-5/2,ZX290L-5G Hitchi Falling machine F/M Satco 630-8 - (Bollicks),null,Hitachi,null,Active,STAG,Satco 630 falling head
+909-2,909MH John Deer Falling Machine FL95 head F/M (Dennis) - (Bollicks),2016,John Deere,1T0909MHLGC302365,Active,Viking,FL95 Falling head
+FL95-1,909MH John Deer Falling Machine FL95 head F/M (Dennis) - (Bollicks),null,John Deere,null,Active,Viking,Waratah Falling head
+EC290B,EC290B Volvo Tailhold & bucket with drawbar - (Bollicks),2005,Volvo,13437,Active,BSW10,Tailhold with fairlead and drawbar
+EC250-4,EC250-4 TA-7 WA131,2020,Volvo,VCEC250DE00271172,Active,BGB,null
+EC220-4,EC220-4 Volvo Shovel Excavator,2021,Volvo,VCEC220DE00271559,Terminated,NBL765,null
+EC300-6,EC300-6 Volvo Waratah 624C,2021,Waratah,VCEC300DV00272089,Active,null,null
+624-4,HTH624C Waratah,2021,Waratah,1WA624CXAM0000583,Active,null,null
+330-3,ZX330 Hitachi with Waratah (Shaun),null,Hitachi,HCMDDE91700041017,Active,Chamois,Waratah Falling Head
+324-1,CAT324 with grapple,2009,CAT,0324DFP00306,Active,BULL,null
+360-1,Volvo 360B - (Bollicks),null,Volvo,null,Active,BSW10,null
+220-5,Volvo EC220D with grapple,2021,Volvo,VCEC220DA00271606,Active,BSW10,null
+290-9/2,Hyundai 290-2 Fixed grapple,null,Hyundai,HHKHZ801HD0002079,Active,Bull,null
+ELTEC,ELTEC FHL317L (Nige),2021,ELTEC,2FHL317LM0194,Active,BBC,Woodsman Felling head
+CFH1400,Woodsman CFH1400,2021,Woodsman,48930620,Active,Boar,Woodsman Felling head
+300-7,EC300DL-7 Grapple,2021,Volvo,VCEC300DT00272280,Active,Stag,CDL H257M Grapple
+300-8,EC300DL-8 F/M 630-3,2021,Volvo,VCEC300DC00272312,Active,Chamois,Satco 630-3
+630-3,Satco Falling Head 630-3,null,Satco,14632,Active,LC1,630-3
+SH300-1,Sumitomo SH300-6 TA8 WA150,2021,Sumitomo,SMT300N6T00BH1335,Active,NBL765,null
+959-3,JD 959K F/M 630H,2021,John Deere,T0959MHLMC406724,Active,NBL765,630-9
+630-9,Satco 630H Series 2,2021,Satco,null,Active,NBL765,630-9
+880-1,Tigercat 880,2013,Tigercat,8800234,Active,Bryant,Waratah 625C
+625-2,Waratah HTH625C,2013,Waratah,1WA625cXV00000040,Active,Boar Extra 765,625C-2
+250-5,EC250D-5 TA9,2021,Volvo,VCEC250DT00271288,Active,Stag,null
+TA9,Falcon Winch TA9,2022,Falcon,WAV02-161A0195A0122,Active,Stag,null
+300-9,Volvo EC300-9,2021,Volvo,null,Active,L9,null
+959-2,John Deere 959,2022,John Deere,null,Active,BGB,null
+630-10,Satco 630H Series 2,2022,Satco,28287,Active,Bull,630-10
+300-10,Volvo EC300-10 Shovel Excavator,2022,Volvo,VCE300DK00272492,Active,Bull,Ensign 1730 Grapple
+SH80-1,Sumitomo SH80BS-6A,2018,Sumitomo,SMT080X6C00BS53191,Active,Hiwipango,null
+758-1,Weiler B758,2022,Weiler,1W90B758KN0002517,Active,Stag,null
+630-10,Satco 630H Series 2,null,Satco,null,Active,Stag,null
+2156G,John Deere 2156G,2022,John Deere,1FF2156GCMD216307,Active,BSW10,Duxon Grapple GX182HD
+F67-1,Ranger,1993,Ranger,F67C2037,Active,Viking,Winch
+648H-1,John Deere 648H,2008,John Deere,DW648HX617775,Active,Workshop,Grapple / winch
+748H-1,John Deere 748H-1,2013,John Deere,Vin: 1DW748HXKDC651806,Active,L9,Grapple
+525-1,CAT 525 skidder - (Bollicks) - Sold May 2023,2007,CAT,CAT0525CJ52500379,Terminated,Workshop,null
+748H-2,John Deere 748H-2,2012,John Deere,1DW748HXJBC639556,Active,BGB,null
+T630-1,Tiger Cat 630D,2011,Tigercat,6303205,Active,Boar,null
+648H-2,John Deere 648H-2,0,John Deere,IDW648HXVBC636705,Active,Chamois,null
+632-2,Tigercat 632E (Andy Billingsley),2019,Tigercat,6320275,Active,BBC,null
+648H-3,John Deere 648H-3,2011,John Deere,1DW648HXJB0635227,Active,Workshop,null
+948L-1,John Deere 948L,null,John Deere,1DW948LXLFC672214,Active,NBL765,null
+T635-1,Tigercat 635D 6 wheel,null,Tigercat,6351103,Active,Boar,null
+848H-1,848H John Deer Grapple Skidder - (Bollicks),2012,John Deere,1DW848HXLCC646647,Active,Bryant,null
+632-3,Tiger Cat 632H,2022,Tigercat,null,Active,Stag,null
+T630-2,Tigercat 630D,2015,Tigercat,6303620,Active,Viking,null
+D6D-1,CAT D6D,1980,CAT,31X1306,Active,Hiwipango,Winch
+D6C-1,CAT D6C,1973,CAT,SN: 10K8293,Active,Hiwipango,Winch
+D65-1,Komatsu D65,1993,Komatsu,Vin: 61585,Active,Bull,Rippers
+D6H-1,CAT D6H,1994,CAT,4YF04074,Active,Viking,Rippers
+TD15-1,TD15,0,International Harvester,Vin: 2U001471,Active,Hiwipango,null
+D7H-1,CAT D7H Dozer,1995,CAT,S/N : 5WB00676,Active,L9,Blade and Ripper
+Bell-1,Bell Ultra #1,1996,Bell,4962,Active,CHAMOIS,Grapple MSP 30158
+Bell-3,Bell Ultra - 4 wheeler,1996,Bell,5413,Active,Hiwipango,Grapple
+Bell-4,Bell Ultra,2000,Bell,5169,Active,Chamois,Grapple
+Bell-5,Bell Ultra,2014,Bell,AEB4182110R000128,Active,NBL765,Grapple
+Bell-6,Bell Telelogger,2021,Bell,AEBA883FV01100149,Active,Hiwipango,Grapple
+TMY50-1,Thunderbird TMY 50 -1,1986,Thunderbird,R5063,Active,Hiwipango,Chains
+M123,Madil 123,1991,Madill,12310,Active,BBC,Grapple
+Alpine,Alpine Grapple - Sold 2022,null,Alpine,AGC2014-016,Terminated,0,null
+W88,Washington 88,1987,Washington,SN 8030,Active,Hiwipango,null
+TSY6255-1,Thunderbird TSY 6255,null,Thunderbird,1993-002,Active,Bull,null
+Howe Line,Howe line Slack Pulling Carriage REG14J23,null,Howe,null,Active,BRYANT,null
+SY1188,Pacific 1188 Swing Yarder,null,Pacific,A-104,Active,BSW10,null
+BE70,Brightwater BE70 LT Yarder,2003,Brightwater,null,Active,Bryant,null
+SD03,Harvestech Delimber,2009,Harvestech,2226,Active,0,null
+SD04,Harvestech Series 3000 Delimber,2011,Harvestech,2310,Active,Boar,null
+Canter,Mitsubishi Canter,0,Mitsubishi,null,Active,0,Flat Deck
+Hiab-1,Isuzu SHH711,null,Isuzu,null,Active,0,Hiab
+2628,Mercedes 2628 Old Yellow,null,Mercedes,WDB34303464787736,Active,0,Tractor Unit
+2538,Mercedes 2538 Dark Green,null,Mercedes,WDB6581472K149897,Active,Hiwipango,Tractor Unit
+2638,Mercedes 2638 6x6 Yellow BBC,null,Mercedes,WDB6593412K303225,Active,Hiwipango,Tractor Unit
+Hiab-2,Hino Hiab - 2,null,Hino,HO7C,Active,0,null
+Foden Truck,Foden 6x4 Tip truck - (Bollicks),1996,Foden,KGE243/SFNS104T1T0302208,Active,Stag,Bin truck
+B30E,Bell B30E Forwarder,null,Bell,AEBA830ET03010268,Active,Bryant,null
