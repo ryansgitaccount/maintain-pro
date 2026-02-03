@@ -28,9 +28,27 @@ export default function Employees() {
   const checkUserRole = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      setUserRole(user?.user_metadata?.role || "employee");
+      if (!user) {
+        setUserRole("employee");
+        return;
+      }
+
+      // Query employees table for the current user's role
+      const { data: employee, error } = await supabase
+        .from("employees")
+        .select("role")
+        .eq("email", user.email)
+        .single();
+
+      if (error || !employee) {
+        // User not in employees table, default to employee role
+        setUserRole("employee");
+      } else {
+        setUserRole(employee.role);
+      }
     } catch (error) {
       console.error("Error checking user role:", error);
+      setUserRole("employee");
     }
   };
 
