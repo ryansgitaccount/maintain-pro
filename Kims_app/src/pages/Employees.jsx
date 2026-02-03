@@ -40,8 +40,6 @@ export default function Employees() {
       // Load employees from employees table
       const employeesList = await Employee.list();
       setEmployees(employeesList || []);
-      setAuthUsers([]);
-      setUnlinkedUsers([]);
     } catch (err) {
       console.error("Failed to load employees:", err);
       toast({
@@ -71,8 +69,7 @@ export default function Employees() {
   const stats = {
     total: employees.length,
     admins: employees.filter(e => e.role === "admin").length,
-    managers: employees.filter(e => e.role === "manager").length,
-    pending: unlinkedUsers.length
+    managers: employees.filter(e => e.role === "manager").length
   };
 
   const handleAdd = () => {
