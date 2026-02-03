@@ -1,188 +1,293 @@
 
 import React, { useState, useEffect, useMemo } from "react";
+import { Employee } from "@/api/entities";
 import { supabase } from "@/api/supabaseClient";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, Shield, Search, HardHat, Wrench, WifiOff, ShieldAlert } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Users, Shield, Search, Plus } from "lucide-react";
+import { useToast } from "@/components/ui/useToast";
 import EmployeeCard from "../components/employees/EmployeeCard";
+import EmployeeForm from "../components/employees/EmployeeForm";
 
 export default function Employees() {
-    const [employees, setEmployees] = useState([]);
-    const [filteredEmployees, setFilteredEmployees] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null); // Add state for error messages
-    const [currentUser, setCurrentUser] = useState(null);
+  const [employees, setEmployees] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState(null);
+  const { toast } = useToast();
 
-    useEffect(() => {
-        loadData();
-    }, []);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-    const loadData = async () => {
-        setIsLoading(true);
-        setError(null); // Clear previous errors
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            setCurrentUser(user);
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
 
-            // For now, just show the current user
-            // In the future, you could add user metadata to check for admin role
-            if (user) {
-                setEmployees([user]); // Display only the current user
-            }
-        } catch (err) {
-            console.error("Failed to load employees:", err);
-            // Handle specific error types
-            if (err.message && err.message.includes("Network")) {
-                setError("A network error occurred. Please check your connection and try again.");
-            } else {
-                setError("An unexpected error occurred while loading employee data.");
-            }
-            setEmployees([]); // Clear employees on error
-            setCurrentUser(null); // Clear current user on error for safety
-        }
-        setIsLoading(false);
-    };
+      // Get user role from metadata
+      const userRole = user?.user_metadata?.role;
+      
+      // Check if user is admin
+      if (userRole !== 'admin') {
+        // Non-admins can only view employees (if RLS allows)
+        console.log('Non-admin user, limited access');
+      }
 
-    useEffect(() => {
-        let filtered = employees;
-        if (searchTerm) {
-            const lowercasedTerm = searchTerm.toLowerCase();
-            filtered = employees.filter(emp =>
-                emp.full_name.toLowerCase().includes(lowercasedTerm) ||
-                emp.email.toLowerCase().includes(lowercasedTerm)
-            );
-        }
-        setFilteredEmployees(filtered);
-    }, [employees, searchTerm]);
+      // Load employees
+      const allEmployees = await Employee.list('created_at');
+      setEmployees(allEmployees || []);
+    } catch (err) {
+      console.error("Failed to load employees:", err);
+      toast({
+        title: "Error",
+        description: "Failed to load employees",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const stats = useMemo(() => ({
-        total: employees.length,
-        admins: employees.filter(e => e.role === 'admin' || (e.employee_types && e.employee_types.includes('admin'))).length,
-        operators: employees.filter(e => e.employee_types && e.employee_types.includes('operator')).length,
-        workshop_staff: employees.filter(e => e.employee_types && e.employee_types.includes('workshop_staff')).length,
-    }), [employees]);
+  useEffect(() => {
+    let filtered = employees;
+    if (searchTerm) {
+      const lowercasedTerm = searchTerm.toLowerCase();
+      filtered = employees.filter(emp =>
+        (emp.full_name?.toLowerCase().includes(lowercasedTerm) ||
+        emp.email?.toLowerCase().includes(lowercasedTerm))
+      );
+    }
+    setFilteredEmployees(filtered);
+  }, [employees, searchTerm]);
 
+  const isAdmin = currentUser?.user_metadata?.role === 'admin';
 
-    return (
-        <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                    <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Employee List</h1>
-                        <p className="text-slate-600 mt-1">View all registered users in the system</p>
-                    </div>
-                </div>
+  const stats = useMemo(() => ({
+    total: employees.length,
+    admins: employees.filter(e => e.role === 'admin').length,
+    managers: employees.filter(e => e.role === 'manager').length,
+    employees: employees.filter(e => e.role === 'employee').length,
+  }), [employees]);
 
-                {/* Stats Cards - only show for admins */}
-                {currentUser?.role === 'admin' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                        <Card className="bg-white shadow-sm border-slate-200">
-                            <CardContent className="p-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-slate-600">Total Employees</p>
-                                        <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
-                                    </div>
-                                    <Users className="w-8 h-8 text-slate-400" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card className="bg-white shadow-sm border-slate-200">
-                            <CardContent className="p-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-blue-600">Admins</p>
-                                        <p className="text-2xl font-bold text-blue-600">{stats.admins}</p>
-                                    </div>
-                                    <Shield className="w-8 h-8 text-blue-400" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                         <Card className="bg-white shadow-sm border-slate-200">
-                            <CardContent className="p-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-teal-600">Operators</p>
-                                        <p className="text-2xl font-bold text-teal-600">{stats.operators}</p>
-                                    </div>
-                                    <HardHat className="w-8 h-8 text-teal-400" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card className="bg-white shadow-sm border-slate-200">
-                            <CardContent className="p-4">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-indigo-600">Workshop Staff</p>
-                                        <p className="text-2xl font-bold text-indigo-600">{stats.workshop_staff}</p>
-                                     </div>
-                                    <Wrench className="w-8 h-8 text-indigo-400" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </div>
-                )}
+  const handleAdd = () => {
+    setEditingEmployee(null);
+    setShowForm(true);
+  };
 
-                {/* Search - only show for admins */}
-                {currentUser?.role === 'admin' && (
-                    <Card className="bg-white shadow-sm border-slate-200 mb-6">
-                        <CardContent className="p-4">
-                            <div className="relative">
-                                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
-                                <Input
-                                    placeholder="Search by name or email..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10"
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-                
-                {/* Error Display */}
-                {error && (
-                    <Card className="bg-yellow-50 border-yellow-200 mb-6">
-                        <CardContent className="p-4 flex items-center gap-3">
-                             {error.includes("permission") ? (
-                                <ShieldAlert className="w-5 h-5 text-yellow-600" />
-                            ) : (
-                                <WifiOff className="w-5 h-5 text-yellow-600" />
-                            )}
-                            <p className="text-yellow-800 font-medium">{error}</p>
-                        </CardContent>
-                    </Card>
-                )}
+  const handleEdit = (employee) => {
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only admins can edit employees",
+        variant: "destructive"
+      });
+      return;
+    }
+    setEditingEmployee(employee);
+    setShowForm(true);
+  };
 
-                {/* Employee Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {isLoading ? (
-                        Array(6).fill(0).map((_, i) => (
-                            <Card key={i} className="bg-white shadow-sm border-slate-200 animate-pulse">
-                                <CardContent className="p-6 flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-slate-200 rounded-full"></div>
-                                    <div className="flex-1 space-y-2">
-                                        <div className="h-4 bg-slate-200 rounded"></div>
-                                        <div className="h-3 bg-slate-200 rounded w-3/4"></div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))
-                    ) : filteredEmployees.length === 0 && !error ? (
-                        <div className="col-span-full text-center py-12">
-                            <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                            <p className="text-slate-500 text-lg">No employees found</p>
-                            <p className="text-slate-400">No users match your search criteria.</p>
-                        </div>
-                    ) : (
-                        filteredEmployees.map((employee) => (
-                            <EmployeeCard key={employee.id} employee={employee} />
-                        ))
-                    )}
-                </div>
-            </div>
+  const handleDelete = async (employeeId) => {
+    if (!isAdmin) {
+      toast({
+        title: "Permission Denied",
+        description: "Only admins can delete employees",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await Employee.delete(employeeId);
+      toast({
+        title: "Success",
+        description: "Employee deleted successfully"
+      });
+      loadData();
+    } catch (err) {
+      console.error("Failed to delete employee:", err);
+      toast({
+        title: "Error",
+        description: "Failed to delete employee",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleFormSubmit = async (formData) => {
+    try {
+      if (editingEmployee) {
+        // Update existing employee
+        await Employee.update(editingEmployee.id, formData);
+        toast({
+          title: "Success",
+          description: "Employee updated successfully"
+        });
+      } else {
+        // Create new employee
+        await Employee.create(formData);
+        toast({
+          title: "Success",
+          description: "Employee created successfully"
+        });
+      }
+      setShowForm(false);
+      setEditingEmployee(null);
+      loadData();
+    } catch (err) {
+      console.error("Failed to save employee:", err);
+      toast({
+        title: "Error",
+        description: err.message || "Failed to save employee",
+        variant: "destructive"
+      });
+    }
+  };
+
+  return (
+    <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Employees</h1>
+            <p className="text-slate-600 mt-1">
+              {isAdmin ? "Manage your team members" : "View employees"}
+            </p>
+          </div>
+          {isAdmin && (
+            <Button
+              onClick={handleAdd}
+              className="bg-slate-800 hover:bg-slate-700"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Employee
+            </Button>
+          )}
         </div>
-    );
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card className="bg-white shadow-sm border-slate-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">Total Employees</p>
+                  <p className="text-2xl font-bold text-slate-900">{stats.total}</p>
+                </div>
+                <Users className="w-8 h-8 text-slate-400" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm border-slate-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-red-600">Admins</p>
+                  <p className="text-2xl font-bold text-red-600">{stats.admins}</p>
+                </div>
+                <Shield className="w-8 h-8 text-red-400" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm border-slate-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-blue-600">Managers</p>
+                  <p className="text-2xl font-bold text-blue-600">{stats.managers}</p>
+                </div>
+                <Shield className="w-8 h-8 text-blue-400" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-white shadow-sm border-slate-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">Team Members</p>
+                  <p className="text-2xl font-bold text-slate-900">{stats.employees}</p>
+                </div>
+                <Users className="w-8 h-8 text-slate-400" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Search */}
+        <Card className="bg-white shadow-sm border-slate-200 mb-6">
+          <CardContent className="p-4">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" />
+              <Input
+                placeholder="Search by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Form */}
+        {showForm && (
+          <EmployeeForm
+            employee={editingEmployee}
+            isAdmin={isAdmin}
+            onSubmit={handleFormSubmit}
+            onCancel={() => {
+              setShowForm(false);
+              setEditingEmployee(null);
+            }}
+          />
+        )}
+
+        {/* Employees Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {isLoading ? (
+            Array(6).fill(0).map((_, i) => (
+              <Card key={i} className="bg-white shadow-sm border-slate-200 animate-pulse">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-slate-200 rounded-full"></div>
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-slate-200 rounded"></div>
+                      <div className="h-3 bg-slate-200 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                  <div className="h-8 bg-slate-200 rounded"></div>
+                </CardContent>
+              </Card>
+            ))
+          ) : filteredEmployees.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500 text-lg">No employees found</p>
+              <p className="text-slate-400">
+                {searchTerm ? "Try adjusting your search" : "Add your first employee to get started"}
+              </p>
+            </div>
+          ) : (
+            filteredEmployees.map((employee) => (
+              <EmployeeCard
+                key={employee.id}
+                employee={employee}
+                isAdmin={isAdmin}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }

@@ -880,6 +880,157 @@ export const ServiceCard = {
 };
 
 // ============================================================
+// HELPER: Sync employee role to auth.user_metadata
+// ============================================================
+const syncRoleToAuth = async (email, role) => {
+  try {
+    // Find the auth user by email using admin API
+    const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
+    
+    if (listError) {
+      console.warn('Could not sync role to auth (admin access may be limited):', listError.message);
+      return;
+    }
+
+    const authUser = users?.find(u => u.email === email);
+    
+    if (authUser) {
+      const { error: updateError } = await supabase.auth.admin.updateUserById(authUser.id, {
+        user_metadata: {
+          role: role
+        }
+      });
+      
+      if (updateError) {
+        console.warn('Could not update auth metadata:', updateError.message);
+      } else {
+        console.log(`✓ Synced role '${role}' to auth.user_metadata for ${email}`);
+      }
+    }
+  } catch (error) {
+    console.warn('Error syncing role to auth:', error.message);
+  }
+};
+
+// ============================================================
+// EMPLOYEES
+// ============================================================
+export const Employee = {
+  async list(orderBy = null, limit = null) {
+    try {
+      let query = supabase.from('employees').select('*');
+      
+      if (orderBy) {
+        const [field, direction] = orderBy.startsWith('-') 
+          ? [orderBy.slice(1), 'desc'] 
+          : [orderBy, 'asc'];
+        query = query.order(field, { ascending: direction === 'asc' });
+      }
+      
+      if (limit) {
+        query = query.limit(limit);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error('Employee.list() error:', err);
+      throw err;
+    }
+  },
+
+  async get(id) {
+    try {
+      const { data, error } = await supabase
+        .from('employees')
+        .select('*')
+        .eq('id', id)
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('Employee.get() error:', err);
+      throw err;
+    }
+  },
+
+  async create(employeeData) {
+    try {
+      const user = await getCurrentUser();
+      
+      const cleaned = cleanData({
+        ...employeeData,
+        role: employeeData.role || 'employee', // DEFAULT TO EMPLOYEE
+        created_by: user.id,
+      });
+
+      const { data, error } = await supabase
+        .from('employees')
+        .insert([cleaned])
+        .select();
+      
+      if (error) throw error;
+
+      // Sync role to auth metadata if email provided
+      if (data?.[0]?.email && cleaned.role) {
+        await syncRoleToAuth(cleaned.email, cleaned.role);
+      }
+
+      return data[0];
+    } catch (err) {
+      console.error('Employee.create() error:', err);
+      throw err;
+    }
+  },
+
+  async update(id, employeeData) {
+    try {
+      const user = await getCurrentUser();
+      
+      const cleaned = cleanData({
+        ...employeeData,
+        updated_by: user.id,
+      });
+
+      const { data, error } = await supabase
+        .from('employees')
+        .update(cleaned)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+
+      // Sync role to auth metadata if role changed
+      if (data?.email && employeeData.role) {
+        await syncRoleToAuth(data.email, employeeData.role);
+      }
+
+      return data;
+    } catch (err) {
+      console.error('Employee.update() error:', err);
+      throw err;
+    }
+  },
+
+  async delete(id) {
+    try {
+      const { error } = await supabase
+        .from('employees')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Employee.delete() error:', err);
+      throw err;
+    }
+  },
+
+  filter: createFilterMethod('employees'),
+};
+
+// ============================================================
 // USER AUTH (Supabase Auth)
 // ============================================================
 export const User = {
