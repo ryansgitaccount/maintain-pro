@@ -1,49 +1,64 @@
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Employee } from "@/api/entities";
 import { supabase } from "@/api/supabaseClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Users, Shield, Search, Plus } from "lucide-react";
+import { Users, Shield, Search, Plus, UserPlus } from "lucide-react";
 import { useToast } from "@/components/ui/useToast";
 import EmployeeCard from "../components/employees/EmployeeCard";
 import EmployeeForm from "../components/employees/EmployeeForm";
 
 export default function Employees() {
   const [employees, setEmployees] = useState([]);
+  const [authUsers, setAuthUsers] = useState([]);
+  const [unlinkedUsers, setUnlinkedUsers] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
   const { toast } = useToast();
 
   useEffect(() => {
     loadData();
+    checkUserRole();
   }, []);
+
+  const checkUserRole = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserRole(user?.user_metadata?.role || "employee");
+    } catch (error) {
+      console.error("Error checking user role:", error);
+    }
+  };
 
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      setCurrentUser(user);
+      // Load employees from employees table
+      const employeesList = await Employee.list();
+      setEmployees(employeesList || []);
 
-      // Get user role from metadata
-      const userRole = user?.user_metadata?.role;
-      
-      // Check if user is admin
-      if (userRole !== 'admin') {
-        // Non-admins can only view employees (if RLS allows)
-        console.log('Non-admin user, limited access');
+      // Load all auth users using admin API
+      try {
+        const { data: { users }, error } = await supabase.auth.admin.listUsers();
+        if (error) throw error;
+        setAuthUsers(users || []);
+
+        // Find users not in employees table
+        const employeeEmails = employeesList.map(e => e.email);
+        const unlinked = users.filter(u => !employeeEmails.includes(u.email));
+        setUnlinkedUsers(unlinked || []);
+      } catch (err) {
+        // Admin API might not be available, just use employees list
+        console.warn("Could not load auth users:", err.message);
+        setAuthUsers([]);
+        setUnlinkedUsers([]);
       }
-
-      // Load employees
-      const allEmployees = await Employee.list('created_at');
-      setEmployees(allEmployees || []);
     } catch (err) {
       console.error("Failed to load employees:", err);
       toast({
@@ -68,14 +83,14 @@ export default function Employees() {
     setFilteredEmployees(filtered);
   }, [employees, searchTerm]);
 
-  const isAdmin = currentUser?.user_metadata?.role === 'admin';
+  const isAdmin = userRole === "admin";
 
-  const stats = useMemo(() => ({
+  const stats = {
     total: employees.length,
-    admins: employees.filter(e => e.role === 'admin').length,
-    managers: employees.filter(e => e.role === 'manager').length,
-    employees: employees.filter(e => e.role === 'employee').length,
-  }), [employees]);
+    admins: employees.filter(e => e.role === "admin").length,
+    managers: employees.filter(e => e.role === "manager").length,
+    pending: unlinkedUsers.length
+  };
 
   const handleAdd = () => {
     setEditingEmployee(null);
@@ -125,14 +140,12 @@ export default function Employees() {
   const handleFormSubmit = async (formData) => {
     try {
       if (editingEmployee) {
-        // Update existing employee
         await Employee.update(editingEmployee.id, formData);
         toast({
           title: "Success",
           description: "Employee updated successfully"
         });
       } else {
-        // Create new employee
         await Employee.create(formData);
         toast({
           title: "Success",
@@ -147,6 +160,28 @@ export default function Employees() {
       toast({
         title: "Error",
         description: err.message || "Failed to save employee",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleConvertToEmployee = async (authUser) => {
+    try {
+      await Employee.create({
+        email: authUser.email,
+        full_name: authUser.user_metadata?.full_name || authUser.email.split("@")[0],
+        role: "employee"
+      });
+      toast({
+        title: "Success",
+        description: `${authUser.email} converted to employee`
+      });
+      loadData();
+    } catch (err) {
+      console.error("Error converting user:", err);
+      toast({
+        title: "Error",
+        description: "Failed to convert user",
         variant: "destructive"
       });
     }
@@ -213,10 +248,10 @@ export default function Employees() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">Team Members</p>
-                  <p className="text-2xl font-bold text-slate-900">{stats.employees}</p>
+                  <p className="text-sm text-slate-600">Pending Users</p>
+                  <p className="text-2xl font-bold text-slate-900">{stats.pending}</p>
                 </div>
-                <Users className="w-8 h-8 text-slate-400" />
+                <UserPlus className="w-8 h-8 text-slate-400" />
               </div>
             </CardContent>
           </Card>
@@ -251,40 +286,81 @@ export default function Employees() {
         )}
 
         {/* Employees Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {isLoading ? (
-            Array(6).fill(0).map((_, i) => (
-              <Card key={i} className="bg-white shadow-sm border-slate-200 animate-pulse">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-slate-200 rounded-full"></div>
-                    <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-slate-200 rounded"></div>
-                      <div className="h-3 bg-slate-200 rounded w-3/4"></div>
-                    </div>
-                  </div>
-                  <div className="h-8 bg-slate-200 rounded"></div>
-                </CardContent>
-              </Card>
-            ))
-          ) : filteredEmployees.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-500 text-lg">No employees found</p>
-              <p className="text-slate-400">
-                {searchTerm ? "Try adjusting your search" : "Add your first employee to get started"}
-              </p>
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 mb-4">
+              Active Employees ({filteredEmployees.length})
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {isLoading ? (
+                Array(6).fill(0).map((_, i) => (
+                  <Card key={i} className="bg-white shadow-sm border-slate-200 animate-pulse">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 bg-slate-200 rounded-full"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-slate-200 rounded"></div>
+                          <div className="h-3 bg-slate-200 rounded w-3/4"></div>
+                        </div>
+                      </div>
+                      <div className="h-8 bg-slate-200 rounded"></div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : filteredEmployees.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-500 text-lg">No employees found</p>
+                  <p className="text-slate-400">
+                    {searchTerm ? "Try adjusting your search" : "Add your first employee to get started"}
+                  </p>
+                </div>
+              ) : (
+                filteredEmployees.map((employee) => (
+                  <EmployeeCard
+                    key={employee.id}
+                    employee={employee}
+                    isAdmin={isAdmin}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                ))
+              )}
             </div>
-          ) : (
-            filteredEmployees.map((employee) => (
-              <EmployeeCard
-                key={employee.id}
-                employee={employee}
-                isAdmin={isAdmin}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))
+          </div>
+
+          {/* Pending Users Section */}
+          {unlinkedUsers.length > 0 && isAdmin && (
+            <div className="border-t border-slate-200 pt-8">
+              <h2 className="text-xl font-bold text-slate-900 mb-2">
+                Pending Users ({unlinkedUsers.length})
+              </h2>
+              <p className="text-slate-600 mb-4">
+                These users have signed up but aren't in the employee system yet
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {unlinkedUsers.map((user) => (
+                  <Card key={user.id} className="bg-white shadow-sm border-slate-200">
+                    <CardContent className="p-6 space-y-4">
+                      <div>
+                        <h3 className="font-semibold text-slate-900">{user.email}</h3>
+                        <p className="text-sm text-slate-600 mt-1">
+                          Signed up: {new Date(user.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Button
+                        onClick={() => handleConvertToEmployee(user)}
+                        size="sm"
+                        className="w-full gap-2 bg-slate-800 hover:bg-slate-700"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        Convert to Employee
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>
