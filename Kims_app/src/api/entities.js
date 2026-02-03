@@ -882,35 +882,8 @@ export const ServiceCard = {
 // ============================================================
 // HELPER: Sync employee role to auth.user_metadata
 // ============================================================
-const syncRoleToAuth = async (email, role) => {
-  try {
-    // Find the auth user by email using admin API
-    const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
-    
-    if (listError) {
-      console.warn('Could not sync role to auth (admin access may be limited):', listError.message);
-      return;
-    }
-
-    const authUser = users?.find(u => u.email === email);
-    
-    if (authUser) {
-      const { error: updateError } = await supabase.auth.admin.updateUserById(authUser.id, {
-        user_metadata: {
-          role: role
-        }
-      });
-      
-      if (updateError) {
-        console.warn('Could not update auth metadata:', updateError.message);
-      } else {
-        console.log(`✓ Synced role '${role}' to auth.user_metadata for ${email}`);
-      }
-    }
-  } catch (error) {
-    console.warn('Error syncing role to auth:', error.message);
-  }
-};
+// Role is now managed in the employees table only
+// No need to sync to auth metadata
 
 // ============================================================
 // EMPLOYEES
@@ -972,11 +945,6 @@ export const Employee = {
       
       if (error) throw error;
 
-      // Sync role to auth metadata if email provided
-      if (data?.[0]?.email && cleaned.role) {
-        await syncRoleToAuth(cleaned.email, cleaned.role);
-      }
-
       return data[0];
     } catch (err) {
       console.error('Employee.create() error:', err);
@@ -1001,11 +969,6 @@ export const Employee = {
         .single();
       
       if (error) throw error;
-
-      // Sync role to auth metadata if role changed
-      if (data?.email && employeeData.role) {
-        await syncRoleToAuth(data.email, employeeData.role);
-      }
 
       return data;
     } catch (err) {

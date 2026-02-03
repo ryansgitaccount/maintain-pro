@@ -5,15 +5,13 @@ import { supabase } from "@/api/supabaseClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Users, Shield, Search, Plus, UserPlus } from "lucide-react";
+import { Users, Shield, Search, Plus } from "lucide-react";
 import { useToast } from "@/components/ui/useToast";
 import EmployeeCard from "../components/employees/EmployeeCard";
 import EmployeeForm from "../components/employees/EmployeeForm";
 
 export default function Employees() {
   const [employees, setEmployees] = useState([]);
-  const [authUsers, setAuthUsers] = useState([]);
-  const [unlinkedUsers, setUnlinkedUsers] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -42,23 +40,8 @@ export default function Employees() {
       // Load employees from employees table
       const employeesList = await Employee.list();
       setEmployees(employeesList || []);
-
-      // Load all auth users using admin API
-      try {
-        const { data: { users }, error } = await supabase.auth.admin.listUsers();
-        if (error) throw error;
-        setAuthUsers(users || []);
-
-        // Find users not in employees table
-        const employeeEmails = employeesList.map(e => e.email);
-        const unlinked = users.filter(u => !employeeEmails.includes(u.email));
-        setUnlinkedUsers(unlinked || []);
-      } catch (err) {
-        // Admin API might not be available, just use employees list
-        console.warn("Could not load auth users:", err.message);
-        setAuthUsers([]);
-        setUnlinkedUsers([]);
-      }
+      setAuthUsers([]);
+      setUnlinkedUsers([]);
     } catch (err) {
       console.error("Failed to load employees:", err);
       toast({
@@ -244,17 +227,6 @@ export default function Employees() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white shadow-sm border-slate-200">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600">Pending Users</p>
-                  <p className="text-2xl font-bold text-slate-900">{stats.pending}</p>
-                </div>
-                <UserPlus className="w-8 h-8 text-slate-400" />
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Search */}
@@ -328,40 +300,6 @@ export default function Employees() {
               )}
             </div>
           </div>
-
-          {/* Pending Users Section */}
-          {unlinkedUsers.length > 0 && isAdmin && (
-            <div className="border-t border-slate-200 pt-8">
-              <h2 className="text-xl font-bold text-slate-900 mb-2">
-                Pending Users ({unlinkedUsers.length})
-              </h2>
-              <p className="text-slate-600 mb-4">
-                These users have signed up but aren't in the employee system yet
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {unlinkedUsers.map((user) => (
-                  <Card key={user.id} className="bg-white shadow-sm border-slate-200">
-                    <CardContent className="p-6 space-y-4">
-                      <div>
-                        <h3 className="font-semibold text-slate-900">{user.email}</h3>
-                        <p className="text-sm text-slate-600 mt-1">
-                          Signed up: {new Date(user.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Button
-                        onClick={() => handleConvertToEmployee(user)}
-                        size="sm"
-                        className="w-full gap-2 bg-slate-800 hover:bg-slate-700"
-                      >
-                        <UserPlus className="w-4 h-4" />
-                        Convert to Employee
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
