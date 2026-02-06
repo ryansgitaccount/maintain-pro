@@ -7,9 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { X, Save, Plus, Trash2 } from "lucide-react";
+import { X, Save, Plus, Trash2, Search } from "lucide-react";
 
 export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplicating = false, machines = [] }) {
+  const [machineSearch, setMachineSearch] = useState("");
   const [formData, setFormData] = useState(() => {
     if (isDuplicating && checklist) {
       const duplicatedChecklist = JSON.parse(JSON.stringify(checklist));
@@ -62,6 +63,11 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
         }));
     }
   };
+
+  const filteredMachines = machines.filter(machine =>
+    machine.plant_id.toLowerCase().includes(machineSearch.toLowerCase()) ||
+    machine.model?.toLowerCase().includes(machineSearch.toLowerCase())
+  );
 
   const handleArrayItemChange = (arrayName, index, field, value) => {
     setFormData(prev => ({
@@ -124,22 +130,37 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="plant_id">Plant ID *</Label>
-              <Select
-                value={formData.plant_id}
-                onValueChange={handleMachineSelect}
-                required
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a Plant ID..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {machines.map(machine => (
-                    <SelectItem key={machine.id} value={machine.plant_id}>
-                      {machine.plant_id} - {machine.model}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input
+                    placeholder="Search Plant ID or model..."
+                    value={machineSearch}
+                    onChange={(e) => setMachineSearch(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <Select
+                  value={formData.plant_id}
+                  onValueChange={handleMachineSelect}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a Plant ID..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredMachines.length > 0 ? (
+                      filteredMachines.map(machine => (
+                        <SelectItem key={machine.id} value={machine.plant_id}>
+                          {machine.plant_id} - {machine.model}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="px-2 py-1.5 text-sm text-slate-500">No machines found</div>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="crew_name">Crew Name</Label>

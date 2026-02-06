@@ -28,7 +28,7 @@ import ChecklistForm from "../components/checklists/ChecklistForm";
 import ChecklistCard from "../components/checklists/ChecklistCard";
 import ChecklistExecutor from "../components/checklists/ChecklistExecutor";
 import { useToast } from "@/components/ui/use-toast";
-import { InvokeLLM } from "@/api/integrations";
+// import { InvokeLLM } from "@/api/integrations"; // TODO: Implement LLM integration via Supabase Edge Functions
 
 export default function Checklists() {
   const [checklists, setChecklists] = useState([]);
@@ -45,39 +45,9 @@ export default function Checklists() {
   const { toast } = useToast();
 
   const getAtRiskMachineIds = useCallback(async () => {
-    try {
-      // This prompt acts as a secure, server-side function to determine at-risk machines
-      const response = await InvokeLLM({
-        prompt: `
-          Analyze the 'Machine' and 'MaintenanceRecord' entities to identify machines that are "at risk".
-          Today's date is ${new Date().toISOString()}.
-
-          A machine is considered "at risk" if it meets the following criteria:
-          1. Its status is 'operational' or 'needs_service'.
-          AND one of the following is true:
-          2. It has not had a MaintenanceRecord created for it in the last 7 days.
-          3. Its 'updated_date' in the Machine entity has not been changed in the last 7 days (indicating no change in operating hours).
-
-          Return only a JSON object with a single key "at_risk_machine_ids", which is an array of the machine IDs that are at risk.
-          Do not return any other text, explanation, or properties.
-        `,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            at_risk_machine_ids: {
-              type: "array",
-              items: { type: "string" },
-            },
-          },
-          required: ["at_risk_machine_ids"],
-        },
-      });
-      return response.at_risk_machine_ids || [];
-    } catch (error) {
-      console.error("Failed to fetch at-risk machine IDs:", error);
-      toast({ title: "Error", description: "Could not determine at-risk machines.", variant: "error" });
-      return [];
-    }
+    // TODO: Implement LLM-based at-risk detection via Supabase Edge Functions
+    // For now, return empty array to avoid LLM integration error
+    return [];
   }, [toast]);
   
   const loadData = useCallback(async () => {
