@@ -1,17 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, Save } from "lucide-react";
+import { Crew } from "@/api/entities";
 
 export default function EmployeeForm({ employee, isAdmin, onSubmit, onCancel }) {
+  const [crews, setCrews] = useState([]);
   const [formData, setFormData] = useState(employee || {
     email: "",
     full_name: "",
     role: "employee",
+    crew_id: ""
   });
+
+  useEffect(() => {
+    loadCrews();
+  }, []);
+
+  const loadCrews = async () => {
+    try {
+      const crewsList = await Crew.list('name');
+      setCrews(crewsList);
+    } catch (err) {
+      console.error("Failed to load crews:", err);
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -105,6 +121,26 @@ export default function EmployeeForm({ employee, isAdmin, onSubmit, onCancel }) 
               <p className="text-xs text-slate-500">Only admins can change roles</p>
             </div>
           )}
+
+          {/* Crew Assignment */}
+          <div className="space-y-2">
+            <Label htmlFor="crew_id">Crew</Label>
+            <Select
+              value={formData.crew_id || ""}
+              onValueChange={(value) => handleInputChange('crew_id', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a crew..." />
+              </SelectTrigger>
+              <SelectContent>
+                {crews.map(crew => (
+                  <SelectItem key={crew.id} value={crew.id}>
+                    {crew.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardContent>
 
         <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">

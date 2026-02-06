@@ -199,36 +199,6 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
             />
           </div>
 
-          {/* Classification (Machine Type) */}
-          <div className="space-y-2">
-            <Label htmlFor="machine_type">Machine Type</Label>
-            <Select
-              value={formData.machine_type}
-              onValueChange={(value) => handleInputChange('machine_type', value)}
-              disabled={!!formData.plant_id}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Machines</SelectItem>
-                <SelectItem value="feller_buncher">Feller Buncher</SelectItem>
-                <SelectItem value="skidder">Skidder</SelectItem>
-                <SelectItem value="forwarder">Forwarder</SelectItem>
-                <SelectItem value="harvester">Harvester</SelectItem>
-                <SelectItem value="delimber">Delimber</SelectItem>
-                <SelectItem value="loader">Loader</SelectItem>
-                <SelectItem value="truck">Truck</SelectItem>
-                <SelectItem value="chainsaw">Chainsaw</SelectItem>
-                <SelectItem value="bulldozer">Bulldozer</SelectItem>
-                <SelectItem value="excavator">Excavator</SelectItem>
-                <SelectItem value="chipper">Chipper</SelectItem>
-                <SelectItem value="traction_assist">Traction Assist</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Tasks Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
