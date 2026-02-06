@@ -954,12 +954,7 @@ export const Employee = {
 
   async update(id, employeeData) {
     try {
-      const user = await getCurrentUser();
-      
-      const cleaned = cleanData({
-        ...employeeData,
-        updated_by: user.id,
-      });
+      const cleaned = cleanData(employeeData);
 
       const { data, error } = await supabase
         .from('employees')
