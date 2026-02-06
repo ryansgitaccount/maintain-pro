@@ -1032,3 +1032,99 @@ export const User = {
     return session;
   },
 };
+
+// ============================================================
+// CREWS
+// ============================================================
+export const Crew = {
+  async list(orderBy = null, limit = null) {
+    try {
+      let query = supabase.from('crews').select('*');
+      
+      if (orderBy) {
+        const [field, direction] = orderBy.startsWith('-') 
+          ? [orderBy.slice(1), 'desc'] 
+          : [orderBy, 'asc'];
+        query = query.order(field, { ascending: direction === 'asc' });
+      }
+      
+      if (limit) {
+        query = query.limit(limit);
+      }
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error('Crew.list() error:', err);
+      throw err;
+    }
+  },
+
+  async get(id) {
+    try {
+      const { data, error } = await supabase
+        .from('crews')
+        .select('*')
+        .eq('id', id)
+        .single();
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('Crew.get() error:', err);
+      throw err;
+    }
+  },
+
+  async create(crewData) {
+    try {
+      const cleaned = cleanData(crewData);
+      
+      const { data, error } = await supabase
+        .from('crews')
+        .insert([cleaned])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('Crew.create() error:', err);
+      throw err;
+    }
+  },
+
+  async update(id, crewData) {
+    try {
+      const cleaned = cleanData(crewData);
+      
+      const { data, error } = await supabase
+        .from('crews')
+        .update(cleaned)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (err) {
+      console.error('Crew.update() error:', err);
+      throw err;
+    }
+  },
+
+  async delete(id) {
+    try {
+      const { error } = await supabase
+        .from('crews')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    } catch (err) {
+      console.error('Crew.delete() error:', err);
+      throw err;
+    }
+  },
+
+  filter: createFilterMethod('crews'),
+};

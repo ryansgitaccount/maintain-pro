@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +8,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { X, Save, Plus, Trash2, Search } from "lucide-react";
+import { Crew } from "@/api/entities";
 
 export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplicating = false, machines = [] }) {
   const [machineSearch, setMachineSearch] = useState("");
+  const [crews, setCrews] = useState([]);
   const [formData, setFormData] = useState(() => {
     if (isDuplicating && checklist) {
       const duplicatedChecklist = JSON.parse(JSON.stringify(checklist));
@@ -26,9 +28,8 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
     }
     return checklist || {
       plant_id: "",
-      crew_name: "",
+      crew_id: "",
       description: "",
-      machine_type: "all",
       tasks: [{ task: "", description: "", required: true, safety_critical: false, requires_measurement: false, measurement_unit: "", acceptable_range: "" }],
       required_tools: [""],
       required_parts: [],
@@ -38,6 +39,19 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
     };
   });
 
+  useEffect(() => {
+    loadCrews();
+  }, []);
+
+  const loadCrews = async () => {
+    try {
+      const crewsList = await Crew.list('name');
+      setCrews(crewsList);
+    } catch (err) {
+      console.error("Failed to load crews:", err);
+    }
+  };
+
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
@@ -46,22 +60,10 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
   };
   
   const handleMachineSelect = (plantId) => {
-    const selectedMachine = machines.find(m => m.plant_id === plantId);
-    if (selectedMachine) {
-        setFormData(prev => ({
-            ...prev,
-            plant_id: selectedMachine.plant_id,
-            machine_type: selectedMachine.machine_type
-        }));
-    } else {
-        // If no machine found (e.g., initial state for new, or no match), just set plant_id
-        setFormData(prev => ({
-            ...prev,
-            plant_id: plantId,
-            // Optionally reset machine_type if no matching machine is found
-            // machine_type: "all" 
-        }));
-    }
+    setFormData(prev => ({
+      ...prev,
+      plant_id: plantId
+    }));
   };
 
   const filteredMachines = machines.filter(machine =>
@@ -104,10 +106,11 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
       safety_requirements: formData.safety_requirements.filter(req => req.trim()),
       pre_work_safety_checks: formData.pre_work_safety_checks.filter(check => check.trim())
     };
-    // Remove maintenance_type and safety_level from the data sent, as they are no longer user-configurable
+    // Remove fields that don't exist in database or are no longer used
     delete cleanedData.maintenance_type;
     delete cleanedData.safety_level;
-    // location_required is no longer part of the form data
+    delete cleanedData.crew_name;
+    delete cleanedData.location_required;
     onSubmit(cleanedData);
   };
 
@@ -162,32 +165,25 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
                 </Select>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="crew_name">Crew Name</Label>
-              <Select
-                value={formData.crew_name}
-                onValueChange={(value) => handleInputChange('crew_name', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a crew..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="BBC">BBC</SelectItem>
-                  <SelectItem value="BGB">BGB</SelectItem>
-                  <SelectItem value="Boar">Boar</SelectItem>
-                  <SelectItem value="Boar Extra">Boar Extra</SelectItem>
-                  <SelectItem value="Bryant">Bryant</SelectItem>
-                  <SelectItem value="BSW">BSW</SelectItem>
-                  <SelectItem value="Bull">Bull</SelectItem>
-                  <SelectItem value="Chamois">Chamois</SelectItem>
-                  <SelectItem value="L9">L9</SelectItem>
-                  <SelectItem value="NBL">NBL</SelectItem>
-                  <SelectItem value="Viking">Viking</SelectItem>
-                  <SelectItem value="Stag">Stag</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="crew_id">Crew</Label>
+            <Select
+              value={formData.crew_id}
+              onValueChange={(value) => handleInputChange('crew_id', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a crew..." />
+              </SelectTrigger>
+              <SelectContent>
+                {crews.map(crew => (
+                  <SelectItem key={crew.id} value={crew.id}>
+                    {crew.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
