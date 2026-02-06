@@ -106,12 +106,12 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
   const handleSubmit = (e) => {
     e.preventDefault();
     // Only send fields that exist in the maintenance_checklists table
+    // Note: plant_id is used for UI selection but isn't stored in the database
     const cleanedData = {
-      plant_id: formData.plant_id,
+      name: formData.plant_id, // Store plant_id in the name field
       crew_id: formData.crew_id || null,
-      name: formData.plant_id,
       description: formData.description,
-      tasks: formData.tasks.filter(task => task.task.trim())
+      items: formData.tasks.filter(task => task.task.trim()) // Convert tasks to items
     };
     onSubmit(cleanedData);
   };
