@@ -59,8 +59,8 @@ export default function Checklists() {
         const [checklistsData, machinesData, recordsData, atRiskIds] = await Promise.all([
           MaintenanceChecklist.list('-updated_at'),
           Machine.list('-plant_id'),
-          // Filter records by the current user's email if available for improved performance
-          MaintenanceRecord.filter({ created_by: user?.email }, "-created_date", 100),
+          // Filter records by the current user's ID for improved performance
+          MaintenanceRecord.filter({ created_by: user?.id }, "-created_date", 100),
           getAtRiskMachineIds() // Call the LLM to get at-risk machine IDs
         ]);
 
