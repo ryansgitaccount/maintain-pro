@@ -105,19 +105,14 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Only send fields that exist in the maintenance_checklists table
     const cleanedData = {
-      ...formData,
-      name: formData.plant_id, // Use plant_id as the name
-      tasks: formData.tasks.filter(task => task.task.trim()),
-      required_tools: formData.required_tools.filter(tool => tool.trim()),
-      safety_requirements: formData.safety_requirements.filter(req => req.trim()),
-      pre_work_safety_checks: formData.pre_work_safety_checks.filter(check => check.trim())
+      plant_id: formData.plant_id,
+      crew_id: formData.crew_id || null,
+      name: formData.plant_id,
+      description: formData.description,
+      tasks: formData.tasks.filter(task => task.task.trim())
     };
-    // Remove fields that don't exist in database or are no longer used
-    delete cleanedData.maintenance_type;
-    delete cleanedData.safety_level;
-    delete cleanedData.crew_name;
-    delete cleanedData.location_required;
     onSubmit(cleanedData);
   };
 
