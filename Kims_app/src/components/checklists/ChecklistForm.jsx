@@ -71,6 +71,13 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
     machine.model?.toLowerCase().includes(machineSearch.toLowerCase())
   );
 
+  // Deduplicate by plant_id - show each plant_id only once
+  const uniqueMachines = Array.from(
+    new Map(
+      filteredMachines.map(machine => [machine.plant_id, machine])
+    ).values()
+  );
+
   const handleArrayItemChange = (arrayName, index, field, value) => {
     setFormData(prev => ({
       ...prev,
@@ -152,9 +159,9 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
                     <SelectValue placeholder="Select a Plant ID..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {filteredMachines.length > 0 ? (
-                      filteredMachines.map(machine => (
-                        <SelectItem key={machine.id} value={machine.plant_id}>
+                    {uniqueMachines.length > 0 ? (
+                      uniqueMachines.map(machine => (
+                        <SelectItem key={machine.plant_id} value={machine.plant_id}>
                           {machine.plant_id} - {machine.model}
                         </SelectItem>
                       ))
