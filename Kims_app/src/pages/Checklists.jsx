@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { MaintenanceChecklist, Machine, MaintenanceRecord } from "@/api/entities";
+import { MaintenanceChecklist, Machine, MaintenanceRecord, Employee, Crew } from "@/api/entities";
 import { supabase } from "@/api/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,7 +41,9 @@ export default function Checklists() {
   const [isDuplicating, setIsDuplicating] = useState(false);
   const [executingChecklist, setExecutingChecklist] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [atRiskMachines, setAtRiskMachines] = useState([]); // Consolidated state for at-risk machines
+  const [atRiskMachines, setAtRiskMachines] = useState([]);
+  const [operatorNames, setOperatorNames] = useState([]);
+  const [crewNames, setCrewNames] = useState([]);
   const { toast } = useToast();
 
   const getAtRiskMachineIds = useCallback(async () => {
@@ -56,17 +58,20 @@ export default function Checklists() {
         const { data: { user } } = await supabase.auth.getUser();
         setCurrentUser(user); // Set current user immediately
 
-        const [checklistsData, machinesData, recordsData, atRiskIds] = await Promise.all([
+        const [checklistsData, machinesData, recordsData, atRiskIds, employees, crews] = await Promise.all([
           MaintenanceChecklist.list('-updated_at'),
           Machine.list('-plant_id'),
-          // Filter records by the current user's ID for improved performance
           MaintenanceRecord.filter({ created_by: user?.id }, "-created_date", 100),
-          getAtRiskMachineIds() // Call the LLM to get at-risk machine IDs
+          getAtRiskMachineIds(),
+          Employee.list(),
+          Crew.list()
         ]);
 
         setChecklists(checklistsData);
         setMachines(machinesData);
         setRecords(recordsData);
+        setOperatorNames(employees.map(e => e.full_name).sort());
+        setCrewNames(crews.map(c => c.name).sort());
 
         const atRisk = machinesData
             .filter(m => atRiskIds.includes(m.id))
@@ -251,6 +256,8 @@ export default function Checklists() {
               setShowExecutor(false);
               setExecutingChecklist(null);
             }}
+            operatorNames={operatorNames}
+            crewNames={crewNames}
           />
         )}
 

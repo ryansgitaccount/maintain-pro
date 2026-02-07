@@ -1,47 +1,27 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { MaintenanceIssue, Machine, MaintenanceRecord } from '@/api/entities';
+import { MaintenanceIssue, Machine, MaintenanceRecord, Employee, Crew } from '@/api/entities';
 import IssueCard from '../components/maintenance/IssueCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Loader2, AlertTriangle, Search, Users } from 'lucide-react';
+import { Loader2, AlertTriangle, Search, Users, Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import IssuesByMachineChart from '../components/maintenance/IssuesByMachineChart';
-
-const operatorNames = [
-    "Aaron Marsh", "Adam Schultz", "Adrian Beevor", "Andrew Clarke", "Andrew Walker", "Andy Billingsley",
-    "Arleah Wearing", "Ashly Newman (Contractor)", "Ben Buschl", "Ben Nisbett", "Bevan Davies", "Bradley Bishell",
-    "Bradley Mackel (Contractor)", "Brian Carter", "Bryan Heslop", "Bryce Renall-Cooper", "Callum Taylor",
-    "Campbell Gibbs", "Charles Badcock", "Chole Fitzpatrick", "Chris Beard", "Chris Braden", "Christopher Jacobsen",
-    "Chris Mead", "Chris Watene", "Connor Blackbourn", "Craig Roeske", "Craig Shepherd", "Craig Thorn",
-    "Dalwyn Harwood", "Daniel Borck", "Darren Swan", "David Templeman", "Dennis Burnett", "Dominic Roberts",
-    "Duncan McNicol", "Gene Gledhill-Munkowits", "Geoffrey Wratt", "George Robbins", "Isaak Guyton",
-    "Jack Austin", "Jaden Roeske", "Jadyn Pezzack", "James Cory", "James Love", "Jared Rogers",
-    "Jared Wadsworth", "Jared Van Der Laan", "Jeff Brooks", "Jeff Hamilton", "Jeff Hogg", "Jimmy Simpson",
-    "Joan Lang", "Jonathon Musson", "Jorin Wells", "Josh Harrison - Hurring Foreman", "Karen Bryant",
-    "Kieran Krammer", "Kieran Puklowski", "Kirk Pont", "Kim Bryant", "Liam Plaisier", "Leigh Puklowski",
-    "Lenae Hope", "Malcolm Hopa", "Marie Davison", "Mark Brown", "Mark Pyers", "Martin Simpson",
-    "Meilan Brown", "Michael Bartlett", "Mike Guyton", "Nicolas Taylor", "Nigel Bryant", "Nigel Hutchinson",
-    "Oliver Dowding", "Paul Vass", "Peter Griffith", "Phill Nicholls", "Regan Wyatt", "Richard Herbert",
-    "Richard Roughan", "Rob Mesman", "Robert Mesman (Senior)", "Robert Wearing", "Robin Ramsay",
-    "Rodney Mear", "Russell Parkes", "Ryan Fisher", "Sam Newell", "Sam Roberts", "Sam Maclean",
-    "Sandy Hemopo", "Scott Miller", "Sean Anderson", "Steve Austin", "Steven Biddulph", "Taine Vanstone",
-    "Tanu Malietoa", "Tasman Vance", "Thomas Taane", "Timothy Manson", "Tyrone Wairau", "William Ching",
-    "Zach Coote"
-].sort();
-
-const crewNames = ["BBC", "BGB", "Boar", "Boar Extra", "Bryant", "BSW", "Bull", "Chamois", "L9", "NBL", "Viking", "Stag", "Other"];
 
 export default function MaintenanceHubPage() {
     const [issues, setIssues] = useState([]);
     const [machines, setMachines] = useState([]);
-    const [records, setRecords] = useState([]); // Add state for records
+    const [records, setRecords] = useState([]);
+    const [employees, setEmployees] = useState([]);
+    const [crews, setCrews] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('open');
     const [priorityFilter, setPriorityFilter] = useState('all');
     const [machineFilter, setMachineFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [crewFilter, setCrewFilter] = useState('all');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     useEffect(() => {
         loadData();
@@ -49,14 +29,18 @@ export default function MaintenanceHubPage() {
 
     const loadData = async () => {
         setIsLoading(true);
-        const [issuesData, machinesData, recordsData] = await Promise.all([
-            MaintenanceIssue.list('-created_date', 500), // Limit to recent 500 issues for performance
+        const [issuesData, machinesData, recordsData, employeesData, crewsData] = await Promise.all([
+            MaintenanceIssue.list('-created_date', 500),
             Machine.list(),
-            MaintenanceRecord.list('-created_at', 1000) // Fetch records to find crew names
+            MaintenanceRecord.list('-created_at', 1000),
+            Employee.list(),
+            Crew.list()
         ]);
         setIssues(issuesData);
         setMachines(machinesData);
-        setRecords(recordsData); // Store records in state
+        setRecords(recordsData);
+        setEmployees(employeesData);
+        setCrews(crewsData);
         setIsLoading(false);
     };
 
@@ -98,8 +82,19 @@ export default function MaintenanceHubPage() {
                     issue.description.toLowerCase().includes(lowerSearchTerm) ||
                     (machine && machine.plant_id && machine.plant_id.toLowerCase().includes(lowerSearchTerm))
                 );
+            })
+            .filter(issue => {
+                if (!startDate && !endDate) return true;
+                const issueDate = new Date(issue.created_date);
+                if (startDate && issueDate < new Date(startDate)) return false;
+                if (endDate) {
+                    const end = new Date(endDate);
+                    end.setHours(23, 59, 59, 999);
+                    if (issueDate > end) return false;
+                }
+                return true;
             });
-    }, [issues, statusFilter, priorityFilter, machineFilter, crewFilter, searchTerm, getMachineById, getRecordById]);
+    }, [issues, statusFilter, priorityFilter, machineFilter, crewFilter, searchTerm, startDate, endDate, getMachineById, getRecordById]);
     
     return (
         <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
@@ -130,6 +125,22 @@ export default function MaintenanceHubPage() {
                                     className="pl-10"
                                 />
                             </div>
+                            <div className="flex gap-2">
+                                <Input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    placeholder="Start Date"
+                                    className="w-full md:w-40"
+                                />
+                                <Input
+                                    type="date"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                    placeholder="End Date"
+                                    className="w-full md:w-40"
+                                />
+                            </div>
                             <Select value={crewFilter} onValueChange={setCrewFilter}>
                                 <SelectTrigger className="w-full md:w-48">
                                     <div className="flex items-center gap-2 text-slate-500">
@@ -139,8 +150,8 @@ export default function MaintenanceHubPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Crews</SelectItem>
-                                    {crewNames.map(crew => (
-                                        <SelectItem key={crew} value={crew}>{crew}</SelectItem>
+                                    {crews.map(crew => (
+                                        <SelectItem key={crew.id} value={crew.name}>{crew.name}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -196,7 +207,7 @@ export default function MaintenanceHubPage() {
                                 key={issue.id}
                                 issue={issue}
                                 machine={getMachineById(issue.machine_id)}
-                                operatorNames={operatorNames}
+                                operatorNames={employees.map(e => e.full_name).sort()}
                                 onUpdate={handleUpdateIssue}
                             />
                         ))}

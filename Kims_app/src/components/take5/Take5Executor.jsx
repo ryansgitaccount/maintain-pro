@@ -8,31 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, Save, AlertTriangle, ShieldCheck } from "lucide-react";
-import { Take5Record } from "@/api/entities";
+import { Take5Record, Employee } from "@/api/entities";
 import { useToast } from "@/components/ui/useToast";
 import { supabase } from "@/api/supabaseClient";
-
-const operatorNames = [
-    "Aaron Marsh", "Adam Schultz", "Adrian Beevor", "Andrew Clarke", "Andrew Walker", "Andy Billingsley",
-    "Arleah Wearing", "Ashly Newman (Contractor)", "Ben Buschl", "Ben Nisbett", "Bevan Davies", "Bradley Bishell",
-    "Bradley Mackel (Contractor)", "Brian Carter", "Bryan Heslop", "Bryce Renall-Cooper", "Callum Taylor",
-    "Campbell Gibbs", "Charles Badcock", "Chole Fitzpatrick", "Chris Beard", "Chris Braden", "Christopher Jacobsen",
-    "Chris Mead", "Chris Watene", "Connor Blackbourn", "Craig Roeske", "Craig Shepherd", "Craig Thorn",
-    "Dalwyn Harwood", "Daniel Borck", "Darren Swan", "David Templeman", "Dennis Burnett", "Dominic Roberts",
-    "Duncan McNicol", "Gene Gledhill-Munkowits", "Geoffrey Wratt", "George Robbins", "Isaak Guyton",
-    "Jack Austin", "Jaden Roeske", "Jadyn Pezzack", "James Cory", "James Love", "Jared Rogers",
-    "Jared Wadsworth", "Jared Van Der Laan", "Jeff Brooks", "Jeff Hamilton", "Jeff Hogg", "Jimmy Simpson",
-    "Joan Lang", "Jonathon Musson", "Jorin Wells", "Josh Harrison - Hurring Foreman", "Karen Bryant",
-    "Kieran Krammer", "Kieran Puklowski", "Kirk Pont", "Kim Bryant", "Liam Plaisier", "Leigh Puklowski",
-    "Lenae Hope", "Malcolm Hopa", "Marie Davison", "Mark Brown", "Mark Pyers", "Martin Simpson",
-    "Meilan Brown", "Michael Bartlett", "Mike Guyton", "Nicolas Taylor", "Nigel Bryant", "Nigel Hutchinson",
-    "Oliver Dowding", "Paul Vass", "Peter Griffith", "Phill Nicholls", "Regan Wyatt", "Richard Herbert",
-    "Richard Roughan", "Rob Mesman", "Robert Mesman (Senior)", "Robert Wearing", "Robin Ramsay",
-    "Rodney Mear", "Russell Parkes", "Ryan Fisher", "Sam Newell", "Sam Roberts", "Sam Maclean",
-    "Sandy Hemopo", "Scott Miller", "Sean Anderson", "Steve Austin", "Steven Biddulph", "Taine Vanstone",
-    "Tanu Malietoa", "Tasman Vance", "Thomas Taane", "Timothy Manson", "Tyrone Wairau", "William Ching",
-    "Zach Coote"
-].sort();
 
 export default function Take5Executor({ onComplete, onCancel }) {
     const [operatorName, setOperatorName] = useState("");
@@ -41,22 +19,25 @@ export default function Take5Executor({ onComplete, onCancel }) {
     const [hazards, setHazards] = useState("");
     const [controls, setControls] = useState("");
     const [isSafe, setIsSafe] = useState(false);
+    const [operatorNames, setOperatorNames] = useState([]);
     const { toast } = useToast();
 
     useEffect(() => {
-      const fetchUserAndSetOperator = async () => {
+      const fetchOperatorsAndUser = async () => {
         try {
-          const { data: { user } } = await supabase.auth.getUser();
-          // Store operator name in localStorage instead of user metadata
+          const employees = await Employee.list();
+          const names = employees.map(e => e.full_name).sort();
+          setOperatorNames(names);
+          
           const lastUsedName = localStorage.getItem('last_used_operator_name');
-          if (lastUsedName && operatorNames.includes(lastUsedName)) {
+          if (lastUsedName && names.includes(lastUsedName)) {
             setOperatorName(lastUsedName);
           }
         } catch(error) {
-          console.warn("Could not fetch current user to pre-fill operator name:", error);
+          console.warn("Could not fetch employees:", error);
         }
       };
-      fetchUserAndSetOperator();
+      fetchOperatorsAndUser();
     }, []);
 
     const handleSubmit = async (e) => {
