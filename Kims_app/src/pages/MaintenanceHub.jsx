@@ -161,8 +161,8 @@ export default function MaintenanceHubPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Crews</SelectItem>
-                                    {crews.map(crew => (
-                                        <SelectItem key={crew.id} value={crew.name}>{crew.name}</SelectItem>
+                                    {crews && crews.map(crew => (
+                                        crew?.name && <SelectItem key={crew.id} value={crew.name}>{crew.name}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
@@ -195,7 +195,7 @@ export default function MaintenanceHubPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Machines</SelectItem>
-                                    {machines.sort((a,b) => (a.plant_id || '').localeCompare(b.plant_id || '')).map(machine => (
+                                    {machines && machines.sort((a,b) => (a.plant_id || '').localeCompare(b.plant_id || '')).filter(m => m.id).map(machine => (
                                         <SelectItem key={machine.id} value={machine.id}>
                                             {machine.plant_id} - {machine.model}
                                         </SelectItem>

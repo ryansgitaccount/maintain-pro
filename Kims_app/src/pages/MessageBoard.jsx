@@ -74,7 +74,7 @@ const MessageItem = ({ message, isCurrentUser }) => {
       )}
       <div className={`max-w-md p-3 rounded-lg ${messageClasses}`}>
         <p className={`text-xs font-bold mb-1 opacity-80`}>
-          {message.author}
+          {message.author || 'Unknown User'}
         </p>
         {message.content && <p className="text-sm whitespace-pre-wrap">{contentWithMentions}</p>}
         <div className={`flex items-center gap-2 mt-2 opacity-70`}>
@@ -339,14 +339,16 @@ export default function MessageBoard() {
 
   const filteredMentionUsers = mentionQuery !== null 
     ? allUsers.filter(user => 
-        user.full_name.toLowerCase().includes(mentionQuery) && user.id !== currentUser?.id
+        user.full_name && user.full_name.toLowerCase().includes(mentionQuery) && user.id !== currentUser?.id
       ) 
     : [];
 
   const filteredMentionMachines = mentionQuery !== null
     ? allMachines.filter(machine => 
-        machine.plant_id.toLowerCase().includes(mentionQuery) || 
-        (machine.model && machine.model.toLowerCase().includes(mentionQuery))
+        machine && machine.plant_id && (
+          machine.plant_id.toLowerCase().includes(mentionQuery) || 
+          (machine.model && machine.model.toLowerCase().includes(mentionQuery))
+        )
       )
     : [];
 
@@ -382,7 +384,7 @@ export default function MessageBoard() {
           <div className="flex items-start gap-3">
             <Avatar className="w-10 h-10">
               <AvatarFallback className="bg-slate-200 text-slate-700">
-                {currentUser && currentUser.full_name ? currentUser.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : <UserIcon size={20} />}
+                {currentUser && currentUser.full_name ? currentUser.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
               </AvatarFallback>
             </Avatar>
             <Popover open={mentionQuery !== null && (filteredMentionUsers.length > 0 || filteredMentionMachines.length > 0)} onOpenChange={(open) => { if (!open) setMentionQuery(null); }}>
@@ -430,7 +432,7 @@ export default function MessageBoard() {
                                             {user.full_name ? user.full_name.split(' ').map(n=>n[0]).join('').toUpperCase() : '?'}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <span className="font-medium text-sm text-slate-800">{user.full_name}</span>
+                                    <span className="font-medium text-sm text-slate-800">{user.full_name || 'Unknown'}</span>
                                 </div>
                             ))}
                         </>

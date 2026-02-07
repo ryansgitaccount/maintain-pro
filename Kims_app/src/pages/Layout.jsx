@@ -397,7 +397,10 @@ const AppLayout = ({ children, currentPageName }) => {
   return (
     <SidebarProvider>
       <Toaster />
-      <div className="min-h-screen flex w-full bg-slate-50">
+      <div className="min-h-screen flex w-full bg-slate-50" style={{
+        paddingLeft: 'env(safe-area-inset-left)',
+        paddingRight: 'env(safe-area-inset-right)',
+      }}>
         <style>
           {`
             :root {
@@ -410,10 +413,20 @@ const AppLayout = ({ children, currentPageName }) => {
               --warning: 245 158 11;
               --warning-foreground: 255 255 255;
             }
+            
+            /* Support for PWA on iOS with notch */
+            body {
+              padding-top: env(safe-area-inset-top);
+              padding-left: env(safe-area-inset-left);
+              padding-right: env(safe-area-inset-right);
+              padding-bottom: env(safe-area-inset-bottom);
+            }
           `}
         </style>
 
-        <Sidebar className="border-r border-slate-200 bg-white">
+        <Sidebar className="border-r border-slate-200 bg-white" style={{
+          marginLeft: 'env(safe-area-inset-left)',
+        }}>
           <SidebarHeader className="border-b border-slate-200 p-6">
             <div className="flex items-center gap-3">
               <div className="w-16 h-12 flex items-center justify-center rounded">
@@ -481,10 +494,16 @@ const AppLayout = ({ children, currentPageName }) => {
           </SidebarFooter>
         </Sidebar>
 
-        <main className="flex-1 flex flex-col h-screen">
-          <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 md:hidden">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger className="hover:bg-slate-100 p-2 rounded-lg transition-colors duration-200" />
+        <main className="flex-1 flex flex-col h-screen" style={{
+          marginRight: 'env(safe-area-inset-right)',
+        }}>
+          <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 md:hidden" style={{
+            paddingTop: 'max(0.75rem, env(safe-area-inset-top))',
+            paddingLeft: 'max(1rem, env(safe-area-inset-left))',
+            paddingRight: 'max(1rem, env(safe-area-inset-right))',
+          }}>
+            <div className="flex items-center gap-4 min-h-[44px]">
+              <SidebarTrigger className="hover:bg-slate-100 p-2 rounded-lg transition-colors duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center" />
               <div className="flex items-center gap-3">
                 <div className="w-10 sm:w-12 h-7 sm:h-8 flex items-center justify-center rounded">
                   <img src="/BRYANT.png" alt="Bryant Logging" className="w-10 sm:w-12 h-7 sm:h-8 object-contain" />
