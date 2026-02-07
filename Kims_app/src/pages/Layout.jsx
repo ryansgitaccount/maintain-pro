@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { MaintenanceRecord, ServiceCard } from "@/api/entities"; // Updated import
+import { MaintenanceRecord, ServiceCard, Machine } from "@/api/entities"; // Updated import
 import { Message } from "@/api/entities";
 import { Notification } from "@/api/entities";
-import { UploadFile, InvokeLLM } from "@/api/integrations"; // Updated import
+import { UploadFile } from "@/api/integrations"; // Updated import
 import { supabase } from "@/api/supabaseClient";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -309,49 +309,39 @@ const AppLayout = ({ children, currentPageName }) => {
       sessionStorage.setItem('hasRunAutoServiceCheck', 'true');
 
       try {
-        const response = await InvokeLLM({
-          prompt: `
-            Analyze all 'Machine' and 'ServiceCard' entities. Your task is to identify machines that require a new service card to be generated.
-
-            A machine is considered for a new service card if it meets these two conditions:
-            1. It is approaching its next service interval. The condition for this is: (machine.last_service_hours + machine.service_interval_hours) - machine.current_operating_hours <= 100 AND > 0.
-            2. There is NO existing 'ServiceCard' for this machine with a 'status' of "open".
-
-            Return a JSON object with a single key "machines_to_create_cards_for", which should be an array of objects. Each object must contain the 'machineId' and 'plantId' of a machine that meets both conditions.
-            If no machines meet the criteria, return an empty array.
-          `,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              machines_to_create_cards_for: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    machineId: { type: "string" },
-                    plantId: { type: "string" }
-                  },
-                  required: ["machineId", "plantId"],
-                },
-              },
-            },
-            required: ["machines_to_create_cards_for"],
-          },
-        });
-
-        if (response && response.machines_to_create_cards_for && response.machines_to_create_cards_for.length > 0) {
-          const cardsToCreate = response.machines_to_create_cards_for.map(m => ({
-            machine_id: m.machineId,
-            plant_id: m.plantId, // Changed from unitNumber
+        // Get all machines and open service cards
+        const machines = await Machine.list();
+        const openCards = await ServiceCard.filter({ status: 'open' });
+        
+        // Track which machines already have open service cards
+        const machinesWithOpenCards = new Set(openCards.map(card => card.machine_id));
+        
+        // Find machines that have reached their service interval
+        const cardsToCreate = machines
+          .filter(machine => {
+            // Check if machine has reached or exceeded its service interval
+            const serviceHoursDue = (machine.last_service_hours || 0) + (machine.service_interval_hours || 0);
+            const currentHours = machine.current_operating_hours || 0;
+            
+            // Service card needed if: current hours >= service hours due AND no open card exists
+            return currentHours >= serviceHoursDue && !machinesWithOpenCards.has(machine.id);
+          })
+          .map(machine => ({
+            machine_id: machine.id,
+            plant_id: machine.plant_id,
             status: 'open',
             service_type: 'scheduled'
           }));
-          
-          await ServiceCard.bulkCreate(cardsToCreate);
+        
+        // Create service cards if any machines need them
+        if (cardsToCreate.length > 0) {
+          for (const cardData of cardsToCreate) {
+            await ServiceCard.create(cardData);
+          }
 
           toast({
             title: "Service Cards Generated",
-            description: `${cardsToCreate.length} new service cards were automatically created for machines approaching their service interval.`,
+            description: `${cardsToCreate.length} new service card(s) created for machines that have reached their service interval.`,
             variant: "info",
           });
           // Dispatch event to notify other components like the Services page

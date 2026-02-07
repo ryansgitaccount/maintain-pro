@@ -863,6 +863,8 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                 description: `${issuesToCreate.length} issue(s) have been automatically logged in the Maintenance Hub.`,
                 variant: 'info'
             });
+            // Dispatch event to notify other components like the MaintenanceHub page
+            window.dispatchEvent(new CustomEvent('maintenance-issues-created'));
         }
         
         onComplete(recordData);

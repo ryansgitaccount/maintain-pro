@@ -25,6 +25,17 @@ export default function MaintenanceHubPage() {
 
     useEffect(() => {
         loadData();
+        
+        // Listen for when issues are created from the checklist
+        const handleIssuesCreated = () => {
+            loadData();
+        };
+        
+        window.addEventListener('maintenance-issues-created', handleIssuesCreated);
+        
+        return () => {
+            window.removeEventListener('maintenance-issues-created', handleIssuesCreated);
+        };
     }, []);
 
     const loadData = async () => {
