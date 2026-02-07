@@ -209,7 +209,8 @@ export default function Services() {
           fill: fill
         };
       })
-      .sort((a, b) => a.hours - b.hours);
+      .sort((a, b) => a.hours - b.hours)
+      .slice(0, 20); // Show only top 20 closest to needing service
   }, [machines, selectedCrew, selectedMachine]);
   
   const getMachineById = (id) => machines.find(m => m.id === id);
@@ -287,7 +288,7 @@ export default function Services() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-slate-900">
               <BarChartIcon className="w-5 h-5" />
-              Machine Service Status (Hours Left)
+              Upcoming Services
             </CardTitle>
           </CardHeader>
           <CardContent>

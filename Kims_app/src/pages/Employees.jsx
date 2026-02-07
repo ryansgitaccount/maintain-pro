@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Employee } from "@/api/entities";
+import { Employee, Crew } from "@/api/entities";
 import { supabase } from "@/api/supabaseClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import EmployeeForm from "../components/employees/EmployeeForm";
 
 export default function Employees() {
   const [employees, setEmployees] = useState([]);
+  const [crews, setCrews] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -55,9 +56,13 @@ export default function Employees() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // Load employees from employees table
-      const employeesList = await Employee.list();
+      // Load employees and crews from tables
+      const [employeesList, crewsList] = await Promise.all([
+        Employee.list(),
+        Crew.list()
+      ]);
       setEmployees(employeesList || []);
+      setCrews(crewsList || []);
     } catch (err) {
       console.error("Failed to load employees:", err);
       toast({
@@ -185,6 +190,12 @@ export default function Employees() {
     }
   };
 
+  const getCrewName = (crewId) => {
+    if (!crewId) return null;
+    const crew = crews.find(c => c.id === crewId);
+    return crew?.name || null;
+  };
+
   return (
     <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
@@ -310,6 +321,7 @@ export default function Employees() {
                     isAdmin={isAdmin}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    crewName={getCrewName(employee.crew_id)}
                   />
                 ))
               )}

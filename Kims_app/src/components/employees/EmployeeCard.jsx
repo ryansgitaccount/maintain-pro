@@ -3,9 +3,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Shield, User, Edit, Trash2 } from "lucide-react";
+import { Shield, User, Edit, Trash2, Users } from "lucide-react";
 
-export default function EmployeeCard({ employee, isAdmin, onEdit, onDelete }) {
+export default function EmployeeCard({ employee, isAdmin, onEdit, onDelete, crewName }) {
   const getInitials = (name) => {
     if (!name) return "?";
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -60,6 +60,16 @@ export default function EmployeeCard({ employee, isAdmin, onEdit, onDelete }) {
             {roleConfig.label}
           </Badge>
         </div>
+
+        {/* Crew Info */}
+        {crewName && (
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="w-4 h-4 text-slate-500" />
+            <p className="text-sm text-slate-700">
+              <span className="font-medium">Crew:</span> {crewName}
+            </p>
+          </div>
+        )}
 
         {/* Created info */}
         {employee.created_at && (
