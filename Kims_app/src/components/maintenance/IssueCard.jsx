@@ -5,9 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format, parseISO } from "date-fns";
-import { AlertTriangle, ChevronDown, CheckCircle, Clock, Settings, User, Save, Image as ImageIcon, Check, Loader2 } from "lucide-react";
+import { AlertTriangle, ChevronDown, CheckCircle, Clock, Settings, User, Save, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/useToast";
 import { Label } from "@/components/ui/label";
 
@@ -87,19 +86,6 @@ export default function IssueCard({ issue, machine, operatorNames, onUpdate }) {
                     <Label className="font-semibold text-slate-800">Issue Description</Label>
                     <p className="mt-1">{issue.description}</p>
                 </div>
-                {issue.photo_url && (
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="flex items-center gap-2">
-                                <ImageIcon className="w-4 h-4" />
-                                View Photo
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                            <img src={issue.photo_url} alt="Issue evidence" className="rounded-md w-full h-auto object-contain" />
-                        </PopoverContent>
-                    </Popover>
-                )}
             </div>
              <div className="space-y-2">
                 <Label htmlFor={`running-notes-${issue.id}`} className="font-semibold text-slate-800">Running Notes</Label>

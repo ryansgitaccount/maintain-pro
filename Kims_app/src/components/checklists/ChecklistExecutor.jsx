@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { MaintenanceRecord } from "@/api/entities";
 import { MaintenanceIssue } from "@/api/entities";
 import { User } from "@/api/entities";
-import { UploadFile } from "@/api/integrations";
 import { useToast } from "@/components/ui/useToast";
 import {
   X,
@@ -25,7 +24,6 @@ import {
   Shield,
   Check,
   CircleOff,
-  Camera,
   Loader2,
   ShieldCheck,
   FireExtinguisher,
@@ -131,36 +129,36 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
   const [isLoadingIssues, setIsLoadingIssues] = useState(false);
   const [fluidLevels, setFluidLevels] = useState(
     fluidTypes.reduce((acc, fluid) => {
-      acc[fluid.key] = { amount: '', status: null, notes: '', photo: null, photoPreview: null, flaggedUser: '' };
+      acc[fluid.key] = { amount: '', status: null, notes: '', flaggedUser: '' };
       return acc;
     }, {})
   );
   const [safetyDevices, setSafetyDevices] = useState(
     safetyDeviceTypes.reduce((acc, device) => {
-      acc[device.key] = { status: null, notes: '', photo: null, photoPreview: null, flaggedUser: '' };
+      acc[device.key] = { status: null, notes: '', flaggedUser: '' };
       return acc;
     }, {})
   );
   const [dailyMaintenanceChecks, setDailyMaintenanceChecks] = useState(
     dailyMaintenanceCheckTypes.reduce((acc, check) => {
-      acc[check.key] = { status: null, notes: '', photo: null, photoPreview: null, flaggedUser: '' };
+      acc[check.key] = { status: null, notes: '', flaggedUser: '' };
       return acc;
     }, {})
   );
   const [workAreaChecks, setWorkAreaChecks] = useState(
     workAreaCheckTypes.reduce((acc, check) => {
-        acc[check.key] = { status: null, notes: '', photo: null, photoPreview: null, flaggedUser: '' };
+        acc[check.key] = { status: null, notes: '', flaggedUser: '' };
         return acc;
     }, {})
   );
   const [safeOperationChecks, setSafeOperationChecks] = useState(
     safeOperationCheckTypes.reduce((acc, check) => {
-        acc[check.key] = { status: null, notes: '', photo: null, photoPreview: null, flaggedUser: '' };
+        acc[check.key] = { status: null, notes: '', flaggedUser: '' };
         return acc;
     }, {})
   );
   const { toast } = useToast();
-  const fileInputRefs = useRef({});
+
 
 
 
@@ -388,27 +386,11 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     }));
   };
 
-  const handleFluidPhotoSelect = (fluidKey, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleFluidChange(fluidKey, 'photo', file);
-      handleFluidChange(fluidKey, 'photoPreview', URL.createObjectURL(file));
-    }
-  };
-
   const handleSafetyDeviceChange = (deviceKey, field, value) => {
     setSafetyDevices(prev => ({
       ...prev,
       [deviceKey]: { ...prev[deviceKey], [field]: value }
     }));
-  };
-
-  const handleSafetyDevicePhotoSelect = (deviceKey, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleSafetyDeviceChange(deviceKey, 'photo', file);
-      handleSafetyDeviceChange(deviceKey, 'photoPreview', URL.createObjectURL(file));
-    }
   };
 
   const handleDailyMaintenanceChange = (checkKey, field, value) => {
@@ -418,14 +400,6 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     }));
   };
 
-  const handleDailyMaintenancePhotoSelect = (checkKey, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleDailyMaintenanceChange(checkKey, 'photo', file);
-      handleDailyMaintenanceChange(checkKey, 'photoPreview', URL.createObjectURL(file));
-    }
-  };
-
   const handleWorkAreaChange = (checkKey, field, value) => {
     setWorkAreaChecks(prev => ({
       ...prev,
@@ -433,27 +407,11 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     }));
   };
 
-  const handleWorkAreaPhotoSelect = (checkKey, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleWorkAreaChange(checkKey, 'photo', file);
-      handleWorkAreaChange(checkKey, 'photoPreview', URL.createObjectURL(file));
-    }
-  };
-
   const handleSafeOperationChange = (checkKey, field, value) => {
     setSafeOperationChecks(prev => ({
       ...prev,
       [checkKey]: { ...prev[checkKey], [field]: value }
     }));
-  };
-
-  const handleSafeOperationPhotoSelect = (checkKey, e) => {
-    const file = e.target.files[0];
-    if (file) {
-      handleSafeOperationChange(checkKey, 'photo', file);
-      handleSafeOperationChange(checkKey, 'photoPreview', URL.createObjectURL(file));
-    }
   };
 
   const saveRecordOffline = (recordData) => {
@@ -533,31 +491,17 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
       return;
     }
 
-    // Process fluid level data, including photo uploads
+    // Process fluid level data
     const fluidChecks = [];
     for (const fluid of fluidTypes) {
       const fluidData = fluidLevels[fluid.key];
-      if (fluidData.amount || fluidData.status || fluidData.notes || fluidData.photo || fluidData.flaggedUser) {
-        let photoUrl = '';
-        if (fluidData.photo && navigator.onLine) { // Only upload photo if online
-          try {
-            const { file_url } = await UploadFile({ file: fluidData.photo });
-            photoUrl = file_url;
-          } catch (error) {
-            console.error(`Failed to upload ${fluid.label} photo:`, error);
-            toast({ title: "Upload Failed", description: `Could not upload photo for ${fluid.label}. Please try again.`, variant: "destructive" });
-            setIsSubmitting(false);
-            return;
-          }
-        }
-        
+      if (fluidData.amount || fluidData.status || fluidData.notes || fluidData.flaggedUser) {
         fluidChecks.push({
           fluid_type: fluid.key,
           amount_added: fluidData.amount ? parseFloat(fluidData.amount) : null,
           status: fluidData.status,
           notes: fluidData.notes,
-          flagged_user: fluidData.flaggedUser || null,
-          photo_url: photoUrl
+          flagged_user: fluidData.flaggedUser || null
         });
       }
     }
@@ -566,25 +510,12 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     const safetyChecks = [];
     for (const device of safetyDeviceTypes) {
         const deviceData = safetyDevices[device.key];
-        if (deviceData.status || deviceData.notes || deviceData.photo || deviceData.flaggedUser) {
-            let photoUrl = '';
-            if (deviceData.photo && navigator.onLine) {
-                try {
-                    const { file_url } = await UploadFile({ file: deviceData.photo });
-                    photoUrl = file_url;
-                } catch (error) {
-                    console.error(`Failed to upload ${device.label} photo:`, error);
-                    toast({ title: "Upload Failed", description: `Could not upload photo for ${device.label}. Please try again.`, variant: "destructive" });
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
+        if (deviceData.status || deviceData.notes || deviceData.flaggedUser) {
             safetyChecks.push({
                 device_type: device.key,
                 status: deviceData.status,
                 notes: deviceData.notes,
-                flagged_user: deviceData.flaggedUser || null,
-                photo_url: photoUrl
+                flagged_user: deviceData.flaggedUser || null
             });
         }
     }
@@ -593,25 +524,12 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     const dailyChecks = [];
     for (const check of dailyMaintenanceCheckTypes) {
         const checkData = dailyMaintenanceChecks[check.key];
-        if (checkData.status || checkData.notes || checkData.photo || checkData.flaggedUser) {
-            let photoUrl = '';
-            if (checkData.photo && navigator.onLine) {
-                try {
-                    const { file_url } = await UploadFile({ file: checkData.photo });
-                    photoUrl = file_url;
-                } catch (error) {
-                    console.error(`Failed to upload ${check.label} photo:`, error);
-                    toast({ title: "Upload Failed", description: `Could not upload photo for ${check.label}. Please try again.`, variant: "destructive" });
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
+        if (checkData.status || checkData.notes || checkData.flaggedUser) {
             dailyChecks.push({
                 check_type: check.key,
                 status: checkData.status,
                 notes: checkData.notes,
-                flagged_user: checkData.flaggedUser || null,
-                photo_url: photoUrl
+                flagged_user: checkData.flaggedUser || null
             });
         }
     }
@@ -620,25 +538,12 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     const workAreaChecksData = [];
     for (const check of workAreaCheckTypes) {
         const checkData = workAreaChecks[check.key];
-        if (checkData.status || checkData.notes || checkData.photo || checkData.flaggedUser) {
-            let photoUrl = '';
-            if (checkData.photo && navigator.onLine) {
-                try {
-                    const { file_url } = await UploadFile({ file: checkData.photo });
-                    photoUrl = file_url;
-                } catch (error) {
-                    console.error(`Failed to upload ${check.label} photo:`, error);
-                    toast({ title: "Upload Failed", description: `Could not upload photo for ${check.label}. Please try again.`, variant: "destructive" });
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
+        if (checkData.status || checkData.notes || checkData.flaggedUser) {
             workAreaChecksData.push({
                 check_type: check.key,
                 status: checkData.status,
                 notes: checkData.notes,
-                flagged_user: checkData.flaggedUser || null,
-                photo_url: photoUrl
+                flagged_user: checkData.flaggedUser || null
             });
         }
     }
@@ -647,25 +552,12 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     const safeOperationChecksData = [];
     for (const check of safeOperationCheckTypes) {
         const checkData = safeOperationChecks[check.key];
-        if (checkData.status || checkData.notes || checkData.photo || checkData.flaggedUser) {
-            let photoUrl = '';
-            if (checkData.photo && navigator.onLine) {
-                try {
-                    const { file_url } = await UploadFile({ file: checkData.photo });
-                    photoUrl = file_url;
-                } catch (error) {
-                    console.error(`Failed to upload ${check.label} photo:`, error);
-                    toast({ title: "Upload Failed", description: `Could not upload photo for ${check.label}. Please try again.`, variant: "destructive" });
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
+        if (checkData.status || checkData.notes || checkData.flaggedUser) {
             safeOperationChecksData.push({
                 check_type: check.key,
                 status: checkData.status,
                 notes: checkData.notes,
-                flagged_user: checkData.flaggedUser || null,
-                photo_url: photoUrl
+                flagged_user: checkData.flaggedUser || null
             });
         }
     }
@@ -1173,36 +1065,6 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                       </Select>
                     </div>
 
-                    <div className="space-y-2">
-                       <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        ref={el => fileInputRefs.current[`fluid-${fluid.key}`] = el}
-                        onChange={(e) => handleFluidPhotoSelect(fluid.key, e)}
-                      />
-                      {fluidLevels[fluid.key].photoPreview ? (
-                        <div className="relative w-24 h-24">
-                          <img src={fluidLevels[fluid.key].photoPreview} alt="Preview" className="rounded-md w-full h-full object-cover" />
-                          <Button
-                            type="button" size="icon" variant="destructive"
-                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
-                            onClick={() => {
-                              handleFluidChange(fluid.key, 'photo', null);
-                              handleFluidChange(fluid.key, 'photoPreview', null);
-                            }}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button type="button" variant="outline" onClick={() => fileInputRefs.current[`fluid-${fluid.key}`]?.click()}>
-                          <Camera className="w-4 h-4 mr-2" />
-                          Add Photo
-                        </Button>
-                      )}
-                    </div>
-
                   </CardContent>
                 </Card>
               ))}
@@ -1282,36 +1144,6 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                             ))}
                         </SelectContent>
                       </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                       <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        ref={el => fileInputRefs.current[`safety-${device.key}`] = el}
-                        onChange={(e) => handleSafetyDevicePhotoSelect(device.key, e)}
-                      />
-                      {safetyDevices[device.key].photoPreview ? (
-                        <div className="relative w-24 h-24">
-                          <img src={safetyDevices[device.key].photoPreview} alt="Preview" className="rounded-md w-full h-full object-cover" />
-                          <Button
-                            type="button" size="icon" variant="destructive"
-                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
-                            onClick={() => {
-                              handleSafetyDeviceChange(device.key, 'photo', null);
-                              handleSafetyDeviceChange(device.key, 'photoPreview', null);
-                            }}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button type="button" variant="outline" onClick={() => fileInputRefs.current[`safety-${device.key}`]?.click()}>
-                          <Camera className="w-4 h-4 mr-2" />
-                          Add Photo
-                        </Button>
-                      )}
                     </div>
 
                   </CardContent>
@@ -1396,36 +1228,6 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                       </Select>
                     </div>
 
-                    <div className="space-y-2">
-                       <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        ref={el => fileInputRefs.current[`daily-${check.key}`] = el}
-                        onChange={(e) => handleDailyMaintenancePhotoSelect(check.key, e)}
-                      />
-                      {dailyMaintenanceChecks[check.key].photoPreview ? (
-                        <div className="relative w-24 h-24">
-                          <img src={dailyMaintenanceChecks[check.key].photoPreview} alt="Preview" className="rounded-md w-full h-full object-cover" />
-                          <Button
-                            type="button" size="icon" variant="destructive"
-                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
-                            onClick={() => {
-                              handleDailyMaintenanceChange(check.key, 'photo', null);
-                              handleDailyMaintenanceChange(check.key, 'photoPreview', null);
-                            }}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button type="button" variant="outline" onClick={() => fileInputRefs.current[`daily-${check.key}`]?.click()}>
-                          <Camera className="w-4 h-4 mr-2" />
-                          Add Photo
-                        </Button>
-                      )}
-                    </div>
-
                   </CardContent>
                 </Card>
               ))}
@@ -1507,36 +1309,6 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                       </Select>
                     </div>
 
-                    <div className="space-y-2">
-                       <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        ref={el => fileInputRefs.current[`workarea-${check.key}`] = el}
-                        onChange={(e) => handleWorkAreaPhotoSelect(check.key, e)}
-                      />
-                      {workAreaChecks[check.key].photoPreview ? (
-                        <div className="relative w-24 h-24">
-                          <img src={workAreaChecks[check.key].photoPreview} alt="Preview" className="rounded-md w-full h-full object-cover" />
-                          <Button
-                            type="button" size="icon" variant="destructive"
-                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
-                            onClick={() => {
-                              handleWorkAreaChange(check.key, 'photo', null);
-                              handleWorkAreaChange(check.key, 'photoPreview', null);
-                            }}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button type="button" variant="outline" onClick={() => fileInputRefs.current[`workarea-${check.key}`]?.click()}>
-                          <Camera className="w-4 h-4 mr-2" />
-                          Add Photo
-                        </Button>
-                      )}
-                    </div>
-
                   </CardContent>
                 </Card>
               ))}
@@ -1616,36 +1388,6 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                             ))}
                         </SelectContent>
                       </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                       <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        ref={el => fileInputRefs.current[`safeop-${check.key}`] = el}
-                        onChange={(e) => handleSafeOperationPhotoSelect(check.key, e)}
-                      />
-                      {safeOperationChecks[check.key].photoPreview ? (
-                        <div className="relative w-24 h-24">
-                          <img src={safeOperationChecks[check.key].photoPreview} alt="Preview" className="rounded-md w-full h-full object-cover" />
-                          <Button
-                            type="button" size="icon" variant="destructive"
-                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full"
-                            onClick={() => {
-                              handleSafeOperationChange(check.key, 'photo', null);
-                              handleSafeOperationChange(check.key, 'photoPreview', null);
-                            }}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <Button type="button" variant="outline" onClick={() => fileInputRefs.current[`safeop-${check.key}`]?.click()}>
-                          <Camera className="w-4 h-4 mr-2" />
-                          Add Photo
-                        </Button>
-                      )}
                     </div>
 
                   </CardContent>
