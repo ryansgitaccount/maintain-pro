@@ -43,9 +43,7 @@ export default function WorkshopJobCardPage() {
         setMachines(machinesData);
         setOperatorNames(employees.map(e => e.full_name).sort());
         setCrewNames(crews.map(c => c.name).sort());
-        setoperatorNames, setOperatorNames] = useState([]);
-    const [crewNames, setCrewNames] = useState([]);
-    const [IsLoading(false);
+        setIsLoading(false);
     };
 
     const handleNewJobCardClick = async () => {
