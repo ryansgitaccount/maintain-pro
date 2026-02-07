@@ -214,8 +214,14 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
       if (lastMachine && (checklist.machine_type === 'all' || checklist.machine_type === lastMachine.machine_type)) {
         setSelectedMachine(lastUsedMachineId);
       }
+    } else if (checklist?.name) {
+      // If no last used machine, find machine by checklist's plant_id (stored in name field)
+      const machine = machines.find(m => m.plant_id === checklist.name);
+      if (machine) {
+        setSelectedMachine(machine.id);
+      }
     }
-  }, [currentUser, machines, checklist.machine_type]);
+  }, [currentUser, machines, checklist.machine_type, checklist?.name]);
 
   useEffect(() => {
     if (currentUser?.last_used_operator_name) {
