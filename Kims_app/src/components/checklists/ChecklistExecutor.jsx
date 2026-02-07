@@ -926,21 +926,6 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
           </div>
 
           {/* Machine Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="machine" className="font-bold text-red-600">Machine *</Label>
-            <Select value={selectedMachine} onValueChange={setSelectedMachine} required>
-              <SelectTrigger id="machine">
-                <SelectValue placeholder="Select a machine..." />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredMachinesForSelection.map(machine => (
-                  <SelectItem key={machine.id} value={machine.id}>
-                    {machine.plant_id} - {machine.model}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
           {selectedMachine && (
               <div className="pt-2">
