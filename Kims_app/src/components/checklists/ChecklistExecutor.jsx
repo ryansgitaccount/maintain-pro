@@ -471,6 +471,7 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('📤 Form submitted - starting validation...');
     setIsSubmitting(true);
 
     // Validate required fields
@@ -687,12 +688,22 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
       safe_operation_checks: safeOperationChecksData,
     };
 
+    console.log('📋 Record payload created:', {
+      fluidCount: fluidChecks.length,
+      safetyCount: safetyChecks.length,
+      dailyCount: dailyChecks.length,
+      workAreaCount: workAreaChecksData.length,
+      safeOpCount: safeOperationChecksData.length,
+    });
+
     // DUPLICATE CHECK LOGIC
     if (navigator.onLine) {
+        console.log('🔄 Checking for duplicate records...');
         const lastRecords = await MaintenanceRecord.filter({ machine_id: selectedMachine }, '-created_date', 1);
         const lastRecord = lastRecords.length > 0 ? lastRecords[0] : null;
 
         if (lastRecord) {
+            console.log('📝 Last record found, comparing...');
             // Prepare current form data for comparison
             const currentComparisonObject = {
                 fluid_checks: normalizeForComparison(recordData.fluid_checks, 'fluid_type'),
@@ -712,6 +723,7 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
             };
 
             if (_isEqual(currentComparisonObject, lastComparisonObject)) {
+                console.log('⚠️ Checklist is identical to previous one - skipping record creation but updating hours');
                 // Answers are the same. Do not create a new record, but update hours and user data.
                 try {
                     const { Machine } = await import('@/api/entities');
@@ -745,6 +757,8 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                     return; // Exit handleSubmit
                 }
             }
+        } else {
+            console.log('✅ No previous records found - proceeding with normal creation');
         }
     }
 
@@ -763,6 +777,7 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
 
       // Also update the machine's current hours
       try {
+        console.log('🔧 Updating machine hours...');
         const machine = machines.find(m => m.id === selectedMachine);
         if (machine && navigator.onLine) { // Only update machine hours if online
           const { Machine } = await import('@/api/entities');
@@ -788,17 +803,20 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     if (navigator.onLine) {
       try {
         const newRecord = await MaintenanceRecord.create(recordData);
+        console.log('✅ Maintenance record created:', newRecord.id);
         toast({ title: "Success", description: "Maintenance record saved successfully.", variant: "success" });
 
         // After saving the record, create issues for any flagged items.
         const issuesToCreate = [];
         const unitNo = machines.find(m => m.id === selectedMachine)?.unit_number || '';
+        console.log('📋 Starting issue creation process for machine:', unitNo);
 
         const processCheckForIssue = (checkStateData, recordCheckData, label) => {
             // Create issue if status is 'issue' OR if an operator is flagged
+            console.log(`  > Checking "${label}":`, { status: checkStateData.status, flaggedUser: checkStateData.flaggedUser });
             if (checkStateData.status === 'issue' || (checkStateData.flaggedUser && checkStateData.flaggedUser !== 'None')) {
                 const issueTitle = `Issue: ${label} - Machine: ${unitNo}`;
-
+                console.log(`  ✓ Creating issue: "${issueTitle}"`);
                 // Check if an open or in_progress issue with the same title already exists for this machine.
                 const existingIssue = openIssues.find(issue => issue.title === issueTitle && (issue.status === 'open' || issue.status === 'in_progress'));
 
@@ -822,6 +840,7 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
         };
 
         // Process fluid checks
+        console.log('🔍 Processing fluid checks...');
         for (const fluid of fluidTypes) {
             const fluidStateData = fluidLevels[fluid.key];
             const matchingRecordFluidCheck = recordData.fluid_checks.find(fc => fc.fluid_type === fluid.key);
@@ -829,6 +848,7 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
         }
 
         // Process safety checks
+        console.log('🔍 Processing safety checks...');
         for (const device of safetyDeviceTypes) {
             const deviceStateData = safetyDevices[device.key];
             const matchingRecordDeviceCheck = recordData.safety_checks.find(sc => sc.device_type === device.key);
@@ -836,6 +856,7 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
         }
 
         // Process daily maintenance checks
+        console.log('🔍 Processing daily maintenance checks...');
         for (const check of dailyMaintenanceCheckTypes) {
             const dailyCheckStateData = dailyMaintenanceChecks[check.key];
             const matchingRecordDailyCheck = recordData.daily_maintenance_checks.find(dmc => dmc.check_type === check.key);
@@ -843,6 +864,7 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
         }
 
         // Process work area checks
+        console.log('🔍 Processing work area checks...');
         for (const check of workAreaCheckTypes) {
             const workAreaCheckStateData = workAreaChecks[check.key];
             const matchingRecordWorkAreaCheck = recordData.work_area_checks.find(wac => wac.check_type === check.key);
@@ -850,14 +872,19 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
         }
         
         // Process safe operation checks
+        console.log('🔍 Processing safe operation checks...');
         for (const check of safeOperationCheckTypes) {
             const safeOpCheckStateData = safeOperationChecks[check.key];
             const matchingRecordSafeOpCheck = recordData.safe_operation_checks.find(soc => soc.check_type === check.key);
             processCheckForIssue(safeOpCheckStateData, matchingRecordSafeOpCheck, check.label);
         }
 
+        console.log(`📊 Total issues to create: ${issuesToCreate.length}`, issuesToCreate);
+
         if (issuesToCreate.length > 0) {
+            console.log('💾 Saving issues to database...');
             await MaintenanceIssue.bulkCreate(issuesToCreate);
+            console.log('✅ Issues saved successfully!');
             toast({
                 title: "Issues Logged",
                 description: `${issuesToCreate.length} issue(s) have been automatically logged in the Maintenance Hub.`,
@@ -865,16 +892,20 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
             });
             // Dispatch event to notify other components like the MaintenanceHub page
             window.dispatchEvent(new CustomEvent('maintenance-issues-created'));
+        } else {
+            console.warn('⚠️ No issues were created - no items marked as issue or flagged');
         }
         
         onComplete(recordData);
       } catch (error) {
-        console.error('Error saving maintenance record online:', error);
+        console.error('❌ Error saving maintenance record online:', error);
+        console.error('Error details:', error.message, error.stack);
         toast({ title: "Online Save Failed", description: "Could not save online. Saving offline instead.", variant: "warning" });
         saveRecordOffline(recordData);
         onComplete(recordData);
       }
     } else {
+        console.log('🔌 Offline - saving to localStorage');
         saveRecordOffline(recordData);
         onComplete(recordData);
     }
