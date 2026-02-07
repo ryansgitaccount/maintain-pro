@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { WorkshopJobCard, Machine } from '@/api/entities';
+import { WorkshopJobCard, Machine, Employee, Crew } from '@/api/entities';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -11,30 +11,6 @@ import { format, parseISO } from 'date-fns';
 import { Plus, Loader2, Wrench, Search, Calendar as CalendarIcon } from 'lucide-react'; // Import Search icon and CalendarIcon
 import JobCardForm from '../components/workshop/JobCardForm';
 import JobCard from '../components/workshop/JobCard';
-
-const operatorNames = [
-    "Aaron Marsh", "Adam Schultz", "Adrian Beevor", "Andrew Clarke", "Andrew Walker", "Andy Billingsley",
-    "Arleah Wearing", "Ashly Newman (Contractor)", "Ben Buschl", "Ben Nisbett", "Bevan Davies", "Bradley Bishell",
-    "Bradley Mackel (Contractor)", "Brian Carter", "Bryan Heslop", "Bryce Renall-Cooper", "Callum Taylor",
-    "Campbell Gibbs", "Charles Badcock", "Chole Fitzpatrick", "Chris Beard", "Chris Braden", "Christopher Jacobsen",
-    "Chris Mead", "Chris Watene", "Connor Blackbourn", "Craig Roeske", "Craig Shepherd", "Craig Thorn",
-    "Dalwyn Harwood", "Daniel Borck", "Darren Swan", "David Templeman", "Dennis Burnett", "Dominic Roberts",
-    "Duncan McNicol", "Gene Gledhill-Munkowits", "Geoffrey Wratt", "George Robbins", "Isaak Guyton",
-    "Jack Austin", "Jaden Roeske", "Jadyn Pezzack", "James Cory", "James Love", "Jared Rogers",
-    "Jared Wadsworth", "Jared Van Der Laan", "Jeff Brooks", "Jeff Hamilton", "Jeff Hogg", "Jimmy Simpson",
-    "Joan Lang", "Jonathon Musson", "Jorin Wells", "Josh Harrison - Hurring Foreman", "Karen Bryant",
-    "Kieran Krammer", "Kieran Puklowski", "Kirk Pont", "Kim Bryant", "Liam Plaisier", "Leigh Puklowski",
-    "Lenae Hope", "Malcolm Hopa", "Marie Davison", "Mark Brown", "Mark Pyers", "Martin Simpson",
-    "Meilan Brown", "Michael Bartlett", "Mike Guyton", "Nicolas Taylor", "Nigel Bryant", "Nigel Hutchinson",
-    "Oliver Dowding", "Paul Vass", "Peter Griffith", "Phill Nicholls", "Regan Wyatt", "Richard Herbert",
-    "Richard Roughan", "Rob Mesman", "Robert Mesman (Senior)", "Robert Wearing", "Robin Ramsay",
-    "Rodney Mear", "Russell Parkes", "Ryan Fisher", "Sam Newell", "Sam Roberts", "Sam Maclean",
-    "Sandy Hemopo", "Scott Miller", "Sean Anderson", "Steve Austin", "Steven Biddulph", "Taine Vanstone",
-    "Tanu Malietoa", "Tasman Vance", "Thomas Taane", "Timothy Manson", "Tyrone Wairau", "William Ching",
-    "Zach Coote"
-].sort();
-
-const crewNames = ["BBC", "BGB", "Boar", "Boar Extra", "Bryant", "BSW", "Bull", "Chamois", "L9", "NBL", "Viking", "Stag", "Other"];
 
 export default function WorkshopJobCardPage() {
     const [jobCards, setJobCards] = useState([]);
@@ -57,13 +33,19 @@ export default function WorkshopJobCardPage() {
 
     const loadData = async () => {
         setIsLoading(true);
-        const [cardsData, machinesData] = await Promise.all([
+        const [cardsData, machinesData, employees, crews] = await Promise.all([
             WorkshopJobCard.list('-created_at'),
-            Machine.list()
+            Machine.list(),
+            Employee.list(),
+            Crew.list()
         ]);
         setJobCards(cardsData);
         setMachines(machinesData);
-        setIsLoading(false);
+        setOperatorNames(employees.map(e => e.full_name).sort());
+        setCrewNames(crews.map(c => c.name).sort());
+        setoperatorNames, setOperatorNames] = useState([]);
+    const [crewNames, setCrewNames] = useState([]);
+    const [IsLoading(false);
     };
 
     const handleNewJobCardClick = async () => {
