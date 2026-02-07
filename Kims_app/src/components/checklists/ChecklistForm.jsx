@@ -24,7 +24,18 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
       delete duplicatedChecklist.safety_level;
       // Remove location_required explicitly if it exists in duplicated checklist
       delete duplicatedChecklist.location_required;
-      return duplicatedChecklist;
+      // Ensure required arrays exist
+      return {
+        plant_id: duplicatedChecklist.plant_id || "",
+        crew_id: duplicatedChecklist.crew_id || "",
+        description: duplicatedChecklist.description || "",
+        tasks: duplicatedChecklist.tasks || duplicatedChecklist.items || [{ task: "", description: "", required: true, safety_critical: false }],
+        required_tools: duplicatedChecklist.required_tools || [""],
+        required_parts: duplicatedChecklist.required_parts || [],
+        safety_requirements: duplicatedChecklist.safety_requirements || [""],
+        environmental_considerations: duplicatedChecklist.environmental_considerations || "",
+        pre_work_safety_checks: duplicatedChecklist.pre_work_safety_checks || [""]
+      };
     }
     return checklist || {
       plant_id: "",
