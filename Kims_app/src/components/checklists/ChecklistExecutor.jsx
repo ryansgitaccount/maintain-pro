@@ -723,10 +723,8 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                     machine_id: selectedMachine,
                     maintenance_record_id: newRecord.id,
                     crew_name: recordData.crew_name,
-                    photo_url: recordCheckData?.photo_url || null,
-                    priority: 'medium', // Default priority, could be dynamic based on issue criticality
+                    priority: 'medium',
                     status: 'open',
-                    assigned_to: checkStateData.flaggedUser && checkStateData.flaggedUser !== 'None' ? checkStateData.flaggedUser : null,
                 });
             }
         };

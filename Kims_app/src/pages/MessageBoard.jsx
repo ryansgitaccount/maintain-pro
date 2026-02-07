@@ -5,6 +5,7 @@ import { Notification } from "@/api/entities";
 import { User } from "@/api/entities";
 import { Machine } from "@/api/entities";
 import { SendEmail, InvokeLLM } from "@/api/integrations";
+import { supabase } from "@/api/supabaseClient";
 import { format, parseISO } from "date-fns";
 import { useToast } from "@/components/ui/useToast";
 import { Button } from "@/components/ui/button";
