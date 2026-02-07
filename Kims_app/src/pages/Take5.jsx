@@ -31,15 +31,15 @@ export default function Take5Page() {
     };
 
     return (
-        <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
+        <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
             <div className="max-w-4xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Take 5 Safety</h1>
-                        <p className="text-slate-600 mt-1">Stop, think, and assess before you start.</p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Take 5 Safety</h1>
+                        <p className="text-sm sm:text-base text-slate-600 mt-1">Stop, think, and assess before you start.</p>
                     </div>
                     {!showForm && (
-                         <Button onClick={() => setShowForm(true)} className="bg-amber-500 hover:bg-amber-600 text-white">
+                         <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white">
                             <Plus className="w-4 h-4 mr-2" />
                             Start New Take 5
                         </Button>

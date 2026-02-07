@@ -168,15 +168,15 @@ export default function Checklists() {
   };
 
   return (
-    <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Operator Checklists</h1>
-            <p className="text-slate-600 mt-1">Manage and execute standardized operator checklists</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Operator Checklists</h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-1">Manage and execute standardized operator checklists</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <Button
               onClick={() => {
                   setEditingChecklist(null);

@@ -150,11 +150,15 @@ export default function MessageBoard() {
         const [machines] = await Promise.all([
             Machine.list() // Fetch machines here
         ]);
-        setCurrentUser(user);
-        setAllMachines(machines); // Set machines state
+        // Set currentUser with full_name from user_metadata
         if (user) {
-            markNotificationsAsRead(user.email);
+          setCurrentUser({
+            ...user,
+            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Unknown User'
+          });
+          markNotificationsAsRead(user.email);
         }
+        setAllMachines(machines); // Set machines state
       } catch (e) {
         console.error("User not logged in or failed to fetch users/machines:", e);
       }
@@ -347,12 +351,12 @@ export default function MessageBoard() {
     : [];
 
   return (
-    <div className="p-6 h-full flex flex-col bg-slate-50">
-      <div className="flex items-center gap-3 mb-6">
+    <div className="p-4 sm:p-6 h-full flex flex-col bg-slate-50">
+      <div className="flex items-center gap-3 mb-6 flex-wrap">
         <MessageSquare className="w-8 h-8 text-slate-800" />
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Message Board</h1>
-          <p className="text-slate-600">Team communication and updates</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Message Board</h1>
+          <p className="text-sm sm:text-base text-slate-600">Team communication and updates</p>
         </div>
       </div>
 

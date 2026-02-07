@@ -62,21 +62,52 @@ export default function IssueCard({ issue, machine, operatorNames, onUpdate }) {
   
   return (
     <Card className={`bg-white shadow-sm border-l-4 ${currentPriority.color} w-full`}>
-      <CardHeader className="flex flex-row justify-between items-start pb-2">
-        <div>
-          <CardTitle className="text-lg font-semibold text-slate-800">{issue.title}</CardTitle>
-          <p className="text-sm text-slate-500">
-            For Machine: <span className="font-medium text-slate-700">{machine?.unit_number || 'Unknown'}</span>
-          </p>
-          {issue.crew_name && (
+      <CardHeader className="space-y-4 pb-3">
+        <div className="flex flex-row justify-between items-start">
+          <div>
+            <CardTitle className="text-lg font-semibold text-slate-800">{issue.title}</CardTitle>
             <p className="text-sm text-slate-500">
-                Crew: <span className="font-medium text-slate-700">{issue.crew_name}</span>
+              For Machine: <span className="font-medium text-slate-700">{machine?.unit_number || 'Unknown'}</span>
             </p>
-          )}
+            {issue.crew_name && (
+              <p className="text-sm text-slate-500">
+                  Crew: <span className="font-medium text-slate-700">{issue.crew_name}</span>
+              </p>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge className={`${currentPriority.badge} text-xs`}>{currentPriority.label}</Badge>
-          <Badge className={`${currentStatus.badge} text-xs`}>{currentStatus.label}</Badge>
+        
+        {/* Status and Priority Selectors */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label htmlFor={`status-${issue.id}`} className="text-xs font-semibold text-slate-700">Status</Label>
+            <Select value={issue.status || 'open'} onValueChange={(value) => onUpdate(issue.id, { status: value })}>
+              <SelectTrigger id={`status-${issue.id}`} className="bg-white h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="open">Open</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
+                <SelectItem value="closed">Closed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-1">
+            <Label htmlFor={`priority-${issue.id}`} className="text-xs font-semibold text-slate-700">Priority</Label>
+            <Select value={issue.priority || 'medium'} onValueChange={(value) => onUpdate(issue.id, { priority: value })}>
+              <SelectTrigger id={`priority-${issue.id}`} className="bg-white h-9">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="critical">Critical</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -107,42 +138,43 @@ export default function IssueCard({ issue, machine, operatorNames, onUpdate }) {
             </div>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 bg-slate-50/50 p-4">
-        <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-slate-500" />
-            <Select value={issue.assigned_to || ""} onValueChange={(value) => onUpdate(issue.id, { assigned_to: value })}>
-                <SelectTrigger className="w-[200px] bg-white">
-                    <SelectValue placeholder="Assign to..." />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value={null}>Unassigned</SelectItem>
-                    {operatorNames.map(name => (
-                        <SelectItem key={name} value={name}>{name}</SelectItem>
-                    ))}
-                </SelectContent>
-            </Select>
+      <CardFooter className="flex flex-col gap-4 bg-slate-50/50 p-4">
+        <div className="space-y-2 w-full">
+          <Label htmlFor={`assigned-${issue.id}`} className="text-sm font-semibold text-slate-700">Assigned To</Label>
+          <Select value={issue.assigned_to || ""} onValueChange={(value) => onUpdate(issue.id, { assigned_to: value || null })}>
+            <SelectTrigger id={`assigned-${issue.id}`} className="bg-white">
+              <SelectValue placeholder="Unassigned" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Unassigned</SelectItem>
+              {operatorNames.map(name => (
+                <SelectItem key={name} value={name}>{name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+        
         {!isResolving ? (
-            <Button onClick={() => setIsResolving(true)} variant="secondary">
-                <Check className="w-4 h-4 mr-2" />
-                Resolve Issue
-            </Button>
+          <Button onClick={() => setIsResolving(true)} variant="secondary" className="w-full">
+            <Check className="w-4 h-4 mr-2" />
+            Resolve Issue
+          </Button>
         ) : (
-            <div className="w-full sm:w-auto flex-1 flex flex-col gap-2">
-                <Textarea 
-                    placeholder="Add resolution notes..."
-                    value={resolutionNotes}
-                    onChange={(e) => setResolutionNotes(e.target.value)}
-                    className="bg-white"
-                />
-                <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => setIsResolving(false)}>Cancel</Button>
-                    <Button size="sm" onClick={handleResolve} disabled={!resolutionNotes}>
-                        <Save className="w-4 h-4 mr-2"/>
-                        Save Resolution
-                    </Button>
-                </div>
+          <div className="w-full flex flex-col gap-2">
+            <Textarea 
+              placeholder="Add resolution notes..."
+              value={resolutionNotes}
+              onChange={(e) => setResolutionNotes(e.target.value)}
+              className="bg-white"
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" size="sm" onClick={() => setIsResolving(false)}>Cancel</Button>
+              <Button size="sm" onClick={handleResolve} disabled={!resolutionNotes}>
+                <Save className="w-4 h-4 mr-2"/>
+                Save Resolution
+              </Button>
             </div>
+          </div>
         )}
       </CardFooter>
     </Card>

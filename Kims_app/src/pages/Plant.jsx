@@ -223,13 +223,13 @@ export default function PlantPage() {
   const statusStats = getStatusStats();
 
   return (
-    <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Plant Management</h1>
-            <p className="text-slate-600 mt-1">Monitor and manage your equipment inventory</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Plant Management</h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-1">Monitor and manage your equipment inventory</p>
           </div>
           <Button 
             onClick={() => setShowForm(true)}
@@ -241,13 +241,13 @@ export default function PlantPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-4 mb-8">
           <Card className="bg-white shadow-sm border-slate-200">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">Total</p>
-                  <p className="text-2xl font-bold text-slate-900">{machines.length}</p>
+                  <p className="text-xs sm:text-sm text-slate-600">Total</p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">{machines.length}</p>
                 </div>
                 <Settings className="w-8 h-8 text-slate-400" />
               </div>

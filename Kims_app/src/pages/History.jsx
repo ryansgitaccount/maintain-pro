@@ -224,20 +224,20 @@ export default function HistoryPage() {
   }, [machineFilter, machines]);
 
   return (
-    <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Maintenance History</h1>
-            <p className="text-slate-600 mt-1">Review all completed maintenance records and resolved issues</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Maintenance History</h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-1">Review all completed maintenance records and resolved issues</p>
           </div>
         </div>
 
         <Card className="bg-white shadow-sm border-slate-200 mb-6">
           <CardContent className="p-4">
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
               <Select value={machineTypeFilter} onValueChange={value => { setMachineTypeFilter(value); setMachineFilter("all"); }}>
-                <SelectTrigger className="w-full md:w-56">
+                <SelectTrigger className="w-full sm:w-auto">
                   <SelectValue placeholder="Filter by machine type..." />
                 </SelectTrigger>
                 <SelectContent>

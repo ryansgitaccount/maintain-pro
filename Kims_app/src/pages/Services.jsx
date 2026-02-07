@@ -232,16 +232,16 @@ export default function Services() {
 
 
   return (
-    <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Services</h1>
-            <p className="text-slate-600 mt-1">View machine service status and manage service records.</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Services</h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-1">View machine service status and manage service records.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
              <Select value={selectedCrew} onValueChange={setSelectedCrew}>
-                <SelectTrigger className="w-full md:w-48">
+                <SelectTrigger className="w-full sm:w-auto">
                     <Users className="w-4 h-4 mr-2 text-slate-500" />
                     <SelectValue placeholder="Filter by crew..." />
                 </SelectTrigger>
@@ -255,7 +255,7 @@ export default function Services() {
                 </SelectContent>
             </Select>
             <Select value={selectedMachine} onValueChange={setSelectedMachine}>
-                <SelectTrigger className="w-full md:w-64">
+                <SelectTrigger className="w-full sm:w-auto">
                     <Wrench className="w-4 h-4 mr-2 text-slate-500" />
                     <SelectValue placeholder="Filter by Plant #..." />
                 </SelectTrigger>
@@ -268,7 +268,7 @@ export default function Services() {
                     ))}
                 </SelectContent>
             </Select>
-            <Button onClick={() => { setEditingCard(null); setShowForm(true); }} className="w-full md:w-auto">
+            <Button onClick={() => { setEditingCard(null); setShowForm(true); }} className="w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Service Card
             </Button>

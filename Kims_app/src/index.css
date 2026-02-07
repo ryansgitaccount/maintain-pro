@@ -155,4 +155,60 @@ button:focus-visible {
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Mobile-friendly improvements */
+  button,
+  [role="button"],
+  a {
+    /* Ensure minimum touch target size of 44x44px */
+    @apply min-h-[2.75rem] min-w-[2.75rem] flex items-center justify-center;
+  }
+
+  /* Input and form elements should have good spacing on mobile */
+  input,
+  textarea,
+  select {
+    @apply text-base; /* Prevent zoom on iOS when input is focused */
+    @apply min-h-[2.75rem]; /* 44px minimum */
+  }
+
+  /* Better spacing for small screens */
+  @media (max-width: 640px) {
+    h1 {
+      @apply text-xl;
+    }
+    h2 {
+      @apply text-lg;
+    }
+    h3 {
+      @apply text-base;
+    }
+    
+    /* Ensure proper line-height for readability */
+    body {
+      @apply leading-relaxed;
+    }
+
+    /* Better card padding on mobile */
+    [class*="card"] {
+      @apply p-3;
+    }
+
+    /* Wider touch targets on mobile */
+    button {
+      @apply min-h-[2.75rem] px-4;
+    }
+  }
+
+  /* Prevent horizontal scroll on small devices */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Better select/dropdown styling for mobile */
+  select {
+    @apply appearance-none bg-no-repeat pr-8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+  }
 }

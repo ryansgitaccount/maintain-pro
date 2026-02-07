@@ -197,20 +197,20 @@ export default function Employees() {
   };
 
   return (
-    <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
+    <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Employees</h1>
-            <p className="text-slate-600 mt-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Employees</h1>
+            <p className="text-sm sm:text-base text-slate-600 mt-1">
               {isAdmin ? "Manage your team members" : "View employees"}
             </p>
           </div>
           {isAdmin && (
             <Button
               onClick={handleAdd}
-              className="bg-slate-800 hover:bg-slate-700"
+              className="w-full sm:w-auto bg-slate-800 hover:bg-slate-700"
             >
               <Plus className="w-4 h-4 mr-2" />
               Add Employee
@@ -219,9 +219,9 @@ export default function Employees() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card className="bg-white shadow-sm border-slate-200">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Total Employees</p>

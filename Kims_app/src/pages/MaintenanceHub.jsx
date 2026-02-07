@@ -108,12 +108,12 @@ export default function MaintenanceHubPage() {
     }, [issues, statusFilter, priorityFilter, machineFilter, crewFilter, searchTerm, startDate, endDate, getMachineById, getRecordById]);
     
     return (
-        <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
+        <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Maintenance Hub</h1>
-                        <p className="text-slate-600 mt-1">Track and resolve all maintenance issues.</p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Maintenance Hub</h1>
+                        <p className="text-sm sm:text-base text-slate-600 mt-1">Track and resolve all maintenance issues.</p>
                     </div>
                 </div>
 
@@ -136,24 +136,24 @@ export default function MaintenanceHubPage() {
                                     className="pl-10"
                                 />
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                                 <Input
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
                                     placeholder="Start Date"
-                                    className="w-full md:w-40"
+                                    className="w-full"
                                 />
                                 <Input
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
                                     placeholder="End Date"
-                                    className="w-full md:w-40"
+                                    className="w-full"
                                 />
                             </div>
                             <Select value={crewFilter} onValueChange={setCrewFilter}>
-                                <SelectTrigger className="w-full md:w-48">
+                                <SelectTrigger className="w-full">
                                     <div className="flex items-center gap-2 text-slate-500">
                                       <Users className="w-4 h-4" />
                                       <SelectValue placeholder="Filter by crew..." />
@@ -167,7 +167,7 @@ export default function MaintenanceHubPage() {
                                 </SelectContent>
                             </Select>
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                <SelectTrigger className="w-full md:w-48">
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Filter by status..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -178,7 +178,7 @@ export default function MaintenanceHubPage() {
                                 </SelectContent>
                             </Select>
                             <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                                <SelectTrigger className="w-full md:w-48">
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Filter by priority..." />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -190,7 +190,7 @@ export default function MaintenanceHubPage() {
                                 </SelectContent>
                             </Select>
                              <Select value={machineFilter} onValueChange={setMachineFilter}>
-                                <SelectTrigger className="w-full md:w-56">
+                                <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Filter by machine..." />
                                 </SelectTrigger>
                                 <SelectContent>

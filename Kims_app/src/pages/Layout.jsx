@@ -482,14 +482,14 @@ const AppLayout = ({ children, currentPageName }) => {
         </Sidebar>
 
         <main className="flex-1 flex flex-col h-screen">
-          <header className="bg-white border-b border-slate-200 px-6 py-4 md:hidden">
+          <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 md:hidden">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-slate-100 p-2 rounded-lg transition-colors duration-200" />
               <div className="flex items-center gap-3">
-                <div className="w-12 h-8 flex items-center justify-center rounded">
-                  <img src="/BRYANT.png" alt="Bryant Logging" className="w-12 h-8 object-contain" />
+                <div className="w-10 sm:w-12 h-7 sm:h-8 flex items-center justify-center rounded">
+                  <img src="/BRYANT.png" alt="Bryant Logging" className="w-10 sm:w-12 h-7 sm:h-8 object-contain" />
                 </div>
-                <h1 className="text-xl font-bold text-slate-900">Bryant Logging</h1>
+                <h1 className="text-lg sm:text-xl font-bold text-slate-900">Bryant Logging</h1>
               </div>
             </div>
           </header>

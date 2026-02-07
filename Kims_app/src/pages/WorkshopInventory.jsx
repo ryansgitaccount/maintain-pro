@@ -115,14 +115,14 @@ export default function WorkshopInventoryPage() {
     const getMachineById = (id) => machines.find(m => m.id === id);
 
     return (
-        <div className="p-6 space-y-8 bg-slate-50 min-h-screen">
+        <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Workshop Inventory</h1>
-                        <p className="text-slate-600 mt-1">Manage parts and supplies for the workshop.</p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Workshop Inventory</h1>
+                        <p className="text-sm sm:text-base text-slate-600 mt-1">Manage parts and supplies for the workshop.</p>
                     </div>
-                    <Button onClick={() => { setEditingItem(null); setShowForm(true); }}>
+                    <Button onClick={() => { setEditingItem(null); setShowForm(true); }} className="w-full sm:w-auto">
                         <Plus className="w-4 h-4 mr-2" />
                         Add New Item
                     </Button>
