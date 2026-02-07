@@ -15,6 +15,8 @@ import JobCard from '../components/workshop/JobCard';
 export default function WorkshopJobCardPage() {
     const [jobCards, setJobCards] = useState([]);
     const [machines, setMachines] = useState([]);
+    const [operatorNames, setOperatorNames] = useState([]);
+    const [crewNames, setCrewNames] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isCreating, setIsCreating] = useState(false);
     const [showForm, setShowForm] = useState(false);
