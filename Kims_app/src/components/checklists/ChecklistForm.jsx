@@ -30,7 +30,7 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
       plant_id: "",
       crew_id: "",
       description: "",
-      tasks: [{ task: "", description: "", required: true, safety_critical: false, requires_measurement: false, measurement_unit: "", acceptable_range: "" }],
+      tasks: [{ task: "", description: "", required: true, safety_critical: false }],
       required_tools: [""],
       required_parts: [],
       safety_requirements: [""],
@@ -207,7 +207,7 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => addArrayItem('tasks', { task: "", description: "", required: true, safety_critical: false, requires_measurement: false, measurement_unit: "", acceptable_range: "" })}
+                onClick={() => addArrayItem('tasks', { task: "", description: "", required: true, safety_critical: false })}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Task
@@ -255,28 +255,7 @@ export default function ChecklistForm({ checklist, onSubmit, onCancel, isDuplica
                         />
                         <Label className="text-sm">Safety Critical</Label>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          checked={task.requires_measurement}
-                          onCheckedChange={(checked) => handleArrayItemChange('tasks', index, 'requires_measurement', checked)}
-                        />
-                        <Label className="text-sm">Requires Measurement</Label>
-                      </div>
                     </div>
-                    {task.requires_measurement && (
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input
-                          placeholder="Unit (e.g., psi, °F)"
-                          value={task.measurement_unit}
-                          onChange={(e) => handleArrayItemChange('tasks', index, 'measurement_unit', e.target.value)}
-                        />
-                        <Input
-                          placeholder="Acceptable range (e.g., 30-50 psi)"
-                          value={task.acceptable_range}
-                          onChange={(e) => handleArrayItemChange('tasks', index, 'acceptable_range', e.target.value)}
-                        />
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
               ))}

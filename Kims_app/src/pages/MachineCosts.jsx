@@ -21,6 +21,7 @@ export default function MachineCostsPage() {
     const [machineTypeFilter, setMachineTypeFilter] = useState("all");
     const [machineFilter, setMachineFilter] = useState("all");
     const [sortBy, setSortBy] = useState("grandTotal");
+    const [sortOrder, setSortOrder] = useState("desc");
 
     useEffect(() => {
         async function loadData() {
@@ -80,8 +81,12 @@ export default function MachineCostsPage() {
             data = data.filter(d => d.id === machineFilter);
         }
 
-        return data.sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0));
-    }, [machineCostData, machineTypeFilter, machineFilter, sortBy]);
+        if (sortOrder === 'asc') {
+            return data.sort((a, b) => (a[sortBy] || 0) - (b[sortBy] || 0));
+        } else {
+            return data.sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0));
+        }
+    }, [machineCostData, machineTypeFilter, machineFilter, sortBy, sortOrder]);
 
     const machineTypes = useMemo(() => {
         const types = new Set(machines.map(m => m.machine_type).filter(Boolean));
@@ -188,6 +193,13 @@ export default function MachineCostsPage() {
                                     <SelectItem value="maintenanceCost">Maintenance Cost</SelectItem>
                                     <SelectItem value="jobCardCost">Job Card Cost</SelectItem>
                                     <SelectItem value="serviceCardCost">Service Card Cost</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Select value={sortOrder} onValueChange={setSortOrder}>
+                                <SelectTrigger className="w-full md:w-48"><SelectValue placeholder="Sort order..." /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="asc">Lowest to Highest</SelectItem>
+                                    <SelectItem value="desc">Highest to Lowest</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
