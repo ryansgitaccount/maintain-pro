@@ -120,7 +120,6 @@ const normalizeForComparison = (checksArray, typeKey) => {
 
 export default function ChecklistExecutor({ checklist, machines, currentUser, onComplete, onCancel, operatorNames = [], crewNames = [] }) {
   const [selectedMachine, setSelectedMachine] = useState("");
-  const [selectedMachineType, setSelectedMachineType] = useState('all');
   const [operatorName, setOperatorName] = useState("");
   const [crewName, setCrewName] = useState(""); // Add state for crew name
   const [currentHours, setCurrentHours] = useState("");
@@ -163,18 +162,13 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
   const { toast } = useToast();
   const fileInputRefs = useRef({});
 
-  const machineTypes = useMemo(() => {
-    const types = new Set(machines.map(m => m.machine_type).filter(Boolean));
-    const sortedTypes = Array.from(types).sort();
-    return ['all', ...sortedTypes];
-  }, [machines]);
+
 
   const filteredMachinesForSelection = useMemo(() => {
     return machines
       .filter(machine => checklist.machine_type === 'all' || machine.machine_type === checklist.machine_type)
-      .filter(machine => selectedMachineType === 'all' || machine.machine_type === selectedMachineType)
       .sort((a, b) => (a.unit_number || '').localeCompare(b.unit_number || ''));
-  }, [machines, checklist.machine_type, selectedMachineType]);
+  }, [machines, checklist.machine_type]);
 
   useEffect(() => {
     if (selectedMachine) {
@@ -218,7 +212,6 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     if (lastUsedMachineId) {
       const lastMachine = machines.find(m => m.id === lastUsedMachineId);
       if (lastMachine && (checklist.machine_type === 'all' || checklist.machine_type === lastMachine.machine_type)) {
-        setSelectedMachineType(lastMachine.machine_type || 'all'); // Set the filter to the last used machine's type
         setSelectedMachine(lastUsedMachineId);
       }
     }
@@ -238,10 +231,7 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
     }
   }, [checklist]);
 
-  const handleMachineTypeChange = (value) => {
-    setSelectedMachineType(value);
-    setSelectedMachine(""); // Reset selected machine when type changes
-  };
+
 
   const handleLoadLastAnswers = async () => {
     if (!selectedMachine) {
@@ -936,41 +926,7 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
           </div>
 
           {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="machine-type" className="font-bold text-red-600">Filter by Machine Type</Label>
-              <Select value={selectedMachineType} onValueChange={handleMachineTypeChange}>
-                <SelectTrigger id="machine-type">
-                  <SelectValue placeholder="Filter by type..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {machineTypes.map(type => (
-                    <SelectItem key={type} value={type}>
-                      {type === 'all' ? 'All Types' : type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="machine" className="font-bold text-red-600">Unit No. *</Label>
-              <Select value={selectedMachine} onValueChange={setSelectedMachine} required>
-                <SelectTrigger id="machine">
-                  <SelectValue placeholder="Choose a Unit No...." />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredMachinesForSelection.map(machine => (
-                    <SelectItem key={machine.id} value={machine.id}>
-                      {machine.unit_number} - {machine.model}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-            
-          {/* Open Issues Section */}
-          {selectedMachine && (
+          <divectedMachine && (
               <div className="pt-2">
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="open-issues">
