@@ -539,6 +539,25 @@ export const MaintenanceIssue = {
     }
   },
 
+  async bulkCreate(issuesData) {
+    try {
+      const cleanedIssues = issuesData.map(issue => cleanData(issue));
+      const issuesWithUser = await Promise.all(
+        cleanedIssues.map(issue => addUserMetadata(issue))
+      );
+      
+      const { data, error } = await supabase
+        .from('maintenance_issues')
+        .insert(issuesWithUser)
+        .select();
+      if (error) throw error;
+      return data || [];
+    } catch (err) {
+      console.error('MaintenanceIssue.bulkCreate() error:', err);
+      throw err;
+    }
+  },
+
   async update(id, issueData) {
     try {
       const cleaned = cleanData(issueData);
