@@ -413,14 +413,6 @@ const AppLayout = ({ children, currentPageName }) => {
               --warning: 245 158 11;
               --warning-foreground: 255 255 255;
             }
-            
-            /* Support for PWA on iOS with notch */
-            body {
-              padding-top: env(safe-area-inset-top);
-              padding-left: env(safe-area-inset-left);
-              padding-right: env(safe-area-inset-right);
-              padding-bottom: env(safe-area-inset-bottom);
-            }
           `}
         </style>
 

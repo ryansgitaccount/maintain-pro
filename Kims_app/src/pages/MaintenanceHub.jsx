@@ -161,9 +161,13 @@ export default function MaintenanceHubPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Crews</SelectItem>
-                                    {crews && crews.map(crew => (
-                                        crew?.name && <SelectItem key={crew.id} value={crew.name}>{crew.name}</SelectItem>
-                                    ))}
+                                    {crews && crews
+                                        .filter(crew => crew && crew.id && crew.name && String(crew.name).trim())
+                                        .map(crew => {
+                                            const crewName = String(crew.name).trim();
+                                            if (!crewName) return null;
+                                            return <SelectItem key={crew.id} value={crewName}>{crewName}</SelectItem>;
+                                        })}
                                 </SelectContent>
                             </Select>
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -195,11 +199,18 @@ export default function MaintenanceHubPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Machines</SelectItem>
-                                    {machines && machines.sort((a,b) => (a.plant_id || '').localeCompare(b.plant_id || '')).filter(m => m.id).map(machine => (
-                                        <SelectItem key={machine.id} value={machine.id}>
-                                            {machine.plant_id} - {machine.model}
-                                        </SelectItem>
-                                    ))}
+                                    {machines && machines
+                                        .filter(m => m && m.id && String(m.id).trim())
+                                        .sort((a,b) => (a.plant_id || '').localeCompare(b.plant_id || ''))
+                                        .map(machine => {
+                                            const machineId = String(machine.id).trim();
+                                            if (!machineId) return null;
+                                            return (
+                                                <SelectItem key={machine.id} value={machineId}>
+                                                    {machine.plant_id} - {machine.model}
+                                                </SelectItem>
+                                            );
+                                        })}
                                 </SelectContent>
                             </Select>
                         </div>
