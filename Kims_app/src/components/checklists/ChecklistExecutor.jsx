@@ -723,6 +723,8 @@ export default function ChecklistExecutor({ checklist, machines, currentUser, on
                     machine_id: selectedMachine,
                     maintenance_record_id: newRecord.id,
                     crew_name: recordData.crew_name,
+                    assigned_to: recordData.operator_name,
+                    updated_by: currentUser?.email,
                     priority: 'medium',
                     status: 'open',
                 });

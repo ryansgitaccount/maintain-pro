@@ -141,12 +141,12 @@ export default function IssueCard({ issue, machine, operatorNames, onUpdate }) {
       <CardFooter className="flex flex-col gap-4 bg-slate-50/50 p-4">
         <div className="space-y-2 w-full">
           <Label htmlFor={`assigned-${issue.id}`} className="text-sm font-semibold text-slate-700">Assigned To</Label>
-          <Select value={issue.assigned_to || ""} onValueChange={(value) => onUpdate(issue.id, { assigned_to: value || null })}>
+          <Select value={issue.assigned_to || "unassigned"} onValueChange={(value) => onUpdate(issue.id, { assigned_to: value === "unassigned" ? null : value })}>
             <SelectTrigger id={`assigned-${issue.id}`} className="bg-white">
               <SelectValue placeholder="Unassigned" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Unassigned</SelectItem>
+              <SelectItem value="unassigned">Unassigned</SelectItem>
               {operatorNames.map(name => (
                 <SelectItem key={name} value={name}>{name}</SelectItem>
               ))}
