@@ -31,7 +31,7 @@ export default function Take5Page() {
     };
 
     return (
-        <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
+        <div className="p-4 sm:p-6 space-y-8 bg-slate-50 w-full">
             <div className="max-w-4xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>

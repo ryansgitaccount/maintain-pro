@@ -108,7 +108,7 @@ export default function MaintenanceHubPage() {
     }, [issues, statusFilter, priorityFilter, machineFilter, crewFilter, searchTerm, startDate, endDate, getMachineById, getRecordById]);
     
     return (
-        <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
+        <div className="p-4 sm:p-6 space-y-8 bg-slate-50 w-full">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
@@ -161,12 +161,26 @@ export default function MaintenanceHubPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Crews</SelectItem>
-                                    {crews && crews
-                                        .filter(crew => crew && crew.id && crew.name && String(crew.name).trim())
+                                    {crews && Array.isArray(crews) && crews
+                                        .filter(crew => {
+                                            try {
+                                                if (!crew || typeof crew !== 'object') return false;
+                                                const name = crew.name;
+                                                if (!name) return false;
+                                                const nameStr = String(name).trim();
+                                                return nameStr.length > 0;
+                                            } catch (e) {
+                                                return false;
+                                            }
+                                        })
                                         .map(crew => {
-                                            const crewName = String(crew.name).trim();
-                                            if (!crewName) return null;
-                                            return <SelectItem key={crew.id} value={crewName}>{crewName}</SelectItem>;
+                                            try {
+                                                const crewName = String(crew.name || '').trim();
+                                                if (!crewName || crewName.length === 0) return null;
+                                                return <SelectItem key={crew.id} value={crewName}>{crewName}</SelectItem>;
+                                            } catch (e) {
+                                                return null;
+                                            }
                                         })}
                                 </SelectContent>
                             </Select>
@@ -199,18 +213,43 @@ export default function MaintenanceHubPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Machines</SelectItem>
-                                    {machines && machines
-                                        .filter(m => m && m.id && String(m.id).trim())
-                                        .sort((a,b) => (a.plant_id || '').localeCompare(b.plant_id || ''))
+                                    {machines && Array.isArray(machines) && machines
+                                        .filter(m => {
+                                            try {
+                                                if (!m || typeof m !== 'object') return false;
+                                                const id = m.id;
+                                                if (!id) return false;
+                                                const idStr = String(id).trim();
+                                                return idStr.length > 0;
+                                            } catch (e) {
+                                                return false;
+                                            }
+                                        })
+                                        .sort((a, b) => {
+                                            try {
+                                                const aPlant = String(a.plant_id || '').trim();
+                                                const bPlant = String(b.plant_id || '').trim();
+                                                return aPlant.localeCompare(bPlant);
+                                            } catch (e) {
+                                                return 0;
+                                            }
+                                        })
                                         .map(machine => {
-                                            const machineId = String(machine.id).trim();
-                                            if (!machineId) return null;
-                                            return (
-                                                <SelectItem key={machine.id} value={machineId}>
-                                                    {machine.plant_id} - {machine.model}
-                                                </SelectItem>
-                                            );
-                                        })}
+                                            try {
+                                                const machineId = String(machine.id || '').trim();
+                                                if (!machineId || machineId.length === 0) return null;
+                                                const plantId = String(machine.plant_id || 'Unknown').trim() || 'Unknown';
+                                                const model = String(machine.model || '').trim() || 'N/A';
+                                                return (
+                                                    <SelectItem key={machine.id} value={machineId}>
+                                                        {plantId} - {model}
+                                                    </SelectItem>
+                                                );
+                                            } catch (e) {
+                                                return null;
+                                            }
+                                        })
+                                    }
                                 </SelectContent>
                             </Select>
                         </div>

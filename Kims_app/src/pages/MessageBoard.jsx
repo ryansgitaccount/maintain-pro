@@ -118,8 +118,23 @@ export default function MessageBoard() {
       const uniqueMessages = Array.from(new Set(combined.map(m => m.id || m.localId)))
           .map(id => combined.find(m => (m.id || m.localId) === id));
 
-      const sorted = uniqueMessages.sort((a, b) => {
-        const dateA = a.created_at ? parseISO(a.created_at) : new Date(0); // Use epoch for unsent messages for sorting
+      // Enrich messages with user full names if creator ID is stored but author name is empty
+      const enrichedMessages = uniqueMessages.map(msg => {
+        try {
+          if ((!msg.author || msg.author === 'Unknown User') && msg.created_by && allUsers && allUsers.length > 0) {
+            const creator = allUsers.find(u => u.id === msg.created_by);
+            if (creator && creator.full_name) {
+              return { ...msg, author: creator.full_name };
+            }
+          }
+          return msg;
+        } catch (e) {
+          return msg;
+        }
+      });
+
+      const sorted = enrichedMessages.sort((a, b) => {
+        const dateA = a.created_at ? parseISO(a.created_at) : new Date(0);
         const dateB = b.created_at ? parseISO(b.created_at) : new Date(0);
         return dateA.getTime() - dateB.getTime();
       });
@@ -130,7 +145,7 @@ export default function MessageBoard() {
       toast({ title: "Error", description: "Could not load messages.", variant: "destructive" });
     }
     setIsLoading(false);
-  }, [toast]);
+  }, [toast, allUsers]);
 
   const markNotificationsAsRead = useCallback(async (userEmail) => {
     if (!userEmail) return;
@@ -147,8 +162,9 @@ export default function MessageBoard() {
     const fetchUserAndMessages = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        const [machines] = await Promise.all([
-            Machine.list() // Fetch machines here
+        const [machines, users] = await Promise.all([
+            Machine.list(),
+            User.list()
         ]);
         // Set currentUser with full_name from user_metadata
         if (user) {
@@ -158,7 +174,8 @@ export default function MessageBoard() {
           });
           markNotificationsAsRead(user.email);
         }
-        setAllMachines(machines); // Set machines state
+        setAllMachines(machines);
+        setAllUsers(users || []);
       } catch (e) {
         console.error("User not logged in or failed to fetch users/machines:", e);
       }
@@ -372,13 +389,19 @@ export default function MessageBoard() {
               <p className="text-sm">Be the first to post a message.</p>
             </div>
           )}
-          {messages.map((msg) => (
-            <MessageItem 
-              key={msg.id || msg.localId} 
-              message={msg} 
-              isCurrentUser={currentUser?.email === msg.created_by} 
-            />
-          ))}
+          {messages.map((msg) => {
+            try {
+              return (
+                <MessageItem 
+                  key={msg.id || msg.localId} 
+                  message={msg} 
+                  isCurrentUser={currentUser?.id === msg.created_by} 
+                />
+              );
+            } catch (e) {
+              return null;
+            }
+          })}
         </ScrollArea>
         <CardContent className="p-4 border-t bg-slate-50">
           <div className="flex items-start gap-3">
