@@ -397,10 +397,9 @@ const AppLayout = ({ children, currentPageName }) => {
   return (
     <SidebarProvider>
       <Toaster />
-      <div className="min-h-screen flex w-full bg-slate-50 flex-col" style={{
+      <div className="min-h-screen flex w-full bg-slate-50" style={{
         paddingLeft: 'env(safe-area-inset-left)',
         paddingRight: 'env(safe-area-inset-right)',
-        paddingTop: 'max(0px, env(safe-area-inset-top))',
       }}>
         <style>
           {`

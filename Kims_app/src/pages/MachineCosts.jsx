@@ -113,7 +113,7 @@ export default function MachineCostsPage() {
     }
 
     return (
-        <div className="p-4 sm:p-6 space-y-8 bg-slate-50 w-full">
+        <div className="p-4 sm:p-6 space-y-8 bg-slate-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <div>
