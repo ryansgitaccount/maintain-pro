@@ -69,6 +69,8 @@ export default function MaintenanceHubPage() {
 
     const getRecordById = useCallback((id) => records.find(r => r.id === id), [records]);
 
+    const getCrewByName = useCallback((name) => crews.find(c => c.name === name), [crews]);
+
     const filteredIssues = useMemo(() => {
         return issues
             .filter(issue => statusFilter === 'all' || issue.status === statusFilter)
@@ -76,13 +78,18 @@ export default function MaintenanceHubPage() {
             .filter(issue => machineFilter === 'all' || issue.machine_id === machineFilter)
             .filter(issue => {
                 if (crewFilter === 'all') return true;
-                // If issue has crew_name, use it.
+                // Get the crew by ID to find its name
+                const selectedCrew = crews.find(c => c.id === crewFilter);
+                if (!selectedCrew) return false;
+                const crewName = selectedCrew.name;
+                
+                // If issue has crew_name, use it
                 if (issue.crew_name) {
-                    return issue.crew_name === crewFilter;
+                    return issue.crew_name === crewName;
                 }
-                // Fallback: If issue doesn't have crew_name, find it from the original record.
+                // Fallback: If issue doesn't have crew_name, find it from the original record
                 const originalRecord = getRecordById(issue.maintenance_record_id);
-                return originalRecord?.crew_name === crewFilter;
+                return originalRecord?.crew_name === crewName;
             })
             .filter(issue => {
                 if (!searchTerm) return true;
@@ -161,27 +168,12 @@ export default function MaintenanceHubPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Crews</SelectItem>
-                                    {crews && Array.isArray(crews) && crews
-                                        .filter(crew => {
-                                            try {
-                                                if (!crew || typeof crew !== 'object') return false;
-                                                const name = crew.name;
-                                                if (!name) return false;
-                                                const nameStr = String(name).trim();
-                                                return nameStr.length > 0;
-                                            } catch (e) {
-                                                return false;
-                                            }
-                                        })
-                                        .map(crew => {
-                                            try {
-                                                const crewName = String(crew.name || '').trim();
-                                                if (!crewName || crewName.length === 0) return null;
-                                                return <SelectItem key={crew.id} value={crewName}>{crewName}</SelectItem>;
-                                            } catch (e) {
-                                                return null;
-                                            }
-                                        })}
+                                    {crews && Array.isArray(crews) && crews.map(crew => {
+                                        if (!crew?.id || !crew?.name) return null;
+                                        const crewName = String(crew.name).trim();
+                                        if (!crewName) return null;
+                                        return <SelectItem key={crew.id} value={crew.id}>{crewName}</SelectItem>;
+                                    })}
                                 </SelectContent>
                             </Select>
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -214,40 +206,18 @@ export default function MaintenanceHubPage() {
                                 <SelectContent>
                                     <SelectItem value="all">All Machines</SelectItem>
                                     {machines && Array.isArray(machines) && machines
-                                        .filter(m => {
-                                            try {
-                                                if (!m || typeof m !== 'object') return false;
-                                                const id = m.id;
-                                                if (!id) return false;
-                                                const idStr = String(id).trim();
-                                                return idStr.length > 0;
-                                            } catch (e) {
-                                                return false;
-                                            }
-                                        })
-                                        .sort((a, b) => {
-                                            try {
-                                                const aPlant = String(a.plant_id || '').trim();
-                                                const bPlant = String(b.plant_id || '').trim();
-                                                return aPlant.localeCompare(bPlant);
-                                            } catch (e) {
-                                                return 0;
-                                            }
-                                        })
+                                        .sort((a, b) => (String(a.plant_id || '').localeCompare(String(b.plant_id || ''))))
                                         .map(machine => {
-                                            try {
-                                                const machineId = String(machine.id || '').trim();
-                                                if (!machineId || machineId.length === 0) return null;
-                                                const plantId = String(machine.plant_id || 'Unknown').trim() || 'Unknown';
-                                                const model = String(machine.model || '').trim() || 'N/A';
-                                                return (
-                                                    <SelectItem key={machine.id} value={machineId}>
-                                                        {plantId} - {model}
-                                                    </SelectItem>
-                                                );
-                                            } catch (e) {
-                                                return null;
-                                            }
+                                            if (!machine?.id) return null;
+                                            const machineId = String(machine.id).trim();
+                                            if (!machineId) return null;
+                                            const plantId = String(machine.plant_id || 'Unknown').trim() || 'Unknown';
+                                            const model = String(machine.model || '').trim() || 'N/A';
+                                            return (
+                                                <SelectItem key={machine.id} value={machineId}>
+                                                    {plantId} - {model}
+                                                </SelectItem>
+                                            );
                                         })
                                     }
                                 </SelectContent>
