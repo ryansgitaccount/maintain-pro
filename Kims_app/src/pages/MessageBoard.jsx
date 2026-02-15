@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Message } from "@/api/entities";
 import { Notification } from "@/api/entities";
-import { User } from "@/api/entities";
+import { Employee } from "@/api/entities";
 import { Machine } from "@/api/entities";
 import { SendEmail, InvokeLLM } from "@/api/integrations";
 import { supabase } from "@/api/supabaseClient";
@@ -118,20 +117,9 @@ export default function MessageBoard() {
       const uniqueMessages = Array.from(new Set(combined.map(m => m.id || m.localId)))
           .map(id => combined.find(m => (m.id || m.localId) === id));
 
-      // Enrich messages with user full names if creator ID is stored but author name is empty
-      const enrichedMessages = uniqueMessages.map(msg => {
-        try {
-          if ((!msg.author || msg.author === 'Unknown User') && msg.created_by && allUsers && allUsers.length > 0) {
-            const creator = allUsers.find(u => u.id === msg.created_by);
-            if (creator && creator.full_name) {
-              return { ...msg, author: creator.full_name };
-            }
-          }
-          return msg;
-        } catch (e) {
-          return msg;
-        }
-      });
+      // Messages already have author field populated when created
+      // For legacy messages without author, they will show "Unknown User"
+      const enrichedMessages = uniqueMessages;
 
       const sorted = enrichedMessages.sort((a, b) => {
         const dateA = a.created_at ? parseISO(a.created_at) : new Date(0);
@@ -145,7 +133,7 @@ export default function MessageBoard() {
       toast({ title: "Error", description: "Could not load messages.", variant: "destructive" });
     }
     setIsLoading(false);
-  }, [toast, allUsers]);
+  }, [toast]);
 
   const markNotificationsAsRead = useCallback(async (userEmail) => {
     if (!userEmail) return;
@@ -162,20 +150,30 @@ export default function MessageBoard() {
     const fetchUserAndMessages = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        const [machines, users] = await Promise.all([
+        const [machines, employees] = await Promise.all([
             Machine.list(),
-            User.list()
+            Employee.list()
         ]);
-        // Set currentUser with full_name from user_metadata
+        
+        // Match auth user to employee record by email
+        let currentUserFullName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Unknown User';
+        if (user && employees) {
+          const matchedEmployee = employees.find(emp => emp.email === user.email);
+          if (matchedEmployee) {
+            currentUserFullName = matchedEmployee.full_name;
+          }
+        }
+        
+        // Set currentUser with full_name from employee record or fallback
         if (user) {
           setCurrentUser({
             ...user,
-            full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Unknown User'
+            full_name: currentUserFullName
           });
           markNotificationsAsRead(user.email);
         }
         setAllMachines(machines);
-        setAllUsers(users || []);
+        setAllUsers(employees || []);
       } catch (e) {
         console.error("User not logged in or failed to fetch users/machines:", e);
       }

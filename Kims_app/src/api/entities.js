@@ -720,6 +720,23 @@ export const WorkshopInventory = {
     }
   },
 
+  async batchCreate(itemsArray) {
+    try {
+      const cleanedItems = itemsArray.map(item => cleanData(item));
+      const itemsWithUser = await Promise.all(cleanedItems.map(item => addUserMetadata(item)));
+      
+      const { data, error } = await supabase
+        .from('workshop_inventory')
+        .insert(itemsWithUser)
+        .select();
+      
+      return { data, error };
+    } catch (err) {
+      console.error('WorkshopInventory.batchCreate() error:', err);
+      return { data: null, error: err };
+    }
+  },
+
   async update(id, itemData) {
     try {
       const cleaned = cleanData(itemData);
@@ -905,106 +922,154 @@ export const ServiceCard = {
 // No need to sync to auth metadata
 
 // ============================================================
-// EMPLOYEES
+// EMPLOYEES API
 // ============================================================
 export const Employee = {
   async list(orderBy = null, limit = null) {
-    try {
-      let query = supabase.from('employees').select('*');
-      
-      if (orderBy) {
-        const [field, direction] = orderBy.startsWith('-') 
-          ? [orderBy.slice(1), 'desc'] 
-          : [orderBy, 'asc'];
-        query = query.order(field, { ascending: direction === 'asc' });
-      }
-      
-      if (limit) {
-        query = query.limit(limit);
-      }
-      
-      const { data, error } = await query;
-      if (error) throw error;
-      return data || [];
-    } catch (err) {
-      console.error('Employee.list() error:', err);
-      throw err;
+    let query = supabase.from('employees').select('*');
+    
+    if (orderBy) {
+      const [field, direction] = orderBy.startsWith('-') 
+        ? [orderBy.slice(1), 'desc'] 
+        : [orderBy, 'asc'];
+      query = query.order(field, { ascending: direction === 'asc' });
     }
+    
+    if (limit) {
+      query = query.limit(limit);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
   },
 
   async get(id) {
-    try {
-      const { data, error } = await supabase
-        .from('employees')
-        .select('*')
-        .eq('id', id)
-        .single();
-      if (error) throw error;
-      return data;
-    } catch (err) {
-      console.error('Employee.get() error:', err);
-      throw err;
-    }
+    const { data, error } = await supabase
+      .from('employees')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return data;
   },
 
   async create(employeeData) {
+    const cleanedData = cleanData(employeeData);
+    const dataWithMeta = await addUserMetadata(cleanedData);
+    const { data, error } = await supabase
+      .from('employees')
+      .insert(dataWithMeta)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async update(id, employeeData) {
+    const cleanedData = cleanData(employeeData);
+    const dataWithMeta = await addUpdateMetadata(cleanedData);
+    const { data, error } = await supabase
+      .from('employees')
+      .update(dataWithMeta)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async delete(id) {
+    const { error } = await supabase
+      .from('employees')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  },
+
+  filter: createFilterMethod('employees')
+};
+
+// ============================================================
+// INVENTORY API
+// ============================================================
+export const Inventory = {
+  async list(orderBy = null, limit = null) {
+    let query = supabase.from('inventory').select('*');
+    
+    if (orderBy) {
+      const [field, direction] = orderBy.startsWith('-') 
+        ? [orderBy.slice(1), 'desc'] 
+        : [orderBy, 'asc'];
+      query = query.order(field, { ascending: direction === 'asc' });
+    }
+    
+    if (limit) {
+      query = query.limit(limit);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
+  },
+
+  async get(id) {
+    const { data, error } = await supabase
+      .from('inventory')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async create(itemData) {
     try {
-      const user = await getCurrentUser();
+      const cleaned = cleanData(itemData);
+      const dataWithUser = await addUserMetadata(cleaned);
       
-      const cleaned = cleanData({
-        ...employeeData,
-        role: employeeData.role || 'employee', // DEFAULT TO EMPLOYEE
-        created_by: user.id,
-      });
-
       const { data, error } = await supabase
-        .from('employees')
-        .insert([cleaned])
-        .select();
-      
+        .from('inventory')
+        .insert([dataWithUser])
+        .select()
+        .single();
       if (error) throw error;
-
-      return data[0];
+      return data;
     } catch (err) {
-      console.error('Employee.create() error:', err);
+      console.error('Inventory.create() error:', err);
       throw err;
     }
   },
 
-  async update(id, employeeData) {
+  async update(id, itemData) {
     try {
-      const cleaned = cleanData(employeeData);
-
+      const cleaned = cleanData(itemData);
+      const dataWithUser = await addUpdateMetadata(cleaned);
+      
       const { data, error } = await supabase
-        .from('employees')
-        .update(cleaned)
+        .from('inventory')
+        .update(dataWithUser)
         .eq('id', id)
         .select()
         .single();
-      
       if (error) throw error;
-
       return data;
     } catch (err) {
-      console.error('Employee.update() error:', err);
+      console.error('Inventory.update() error:', err);
       throw err;
     }
   },
 
   async delete(id) {
-    try {
-      const { error } = await supabase
-        .from('employees')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
-    } catch (err) {
-      console.error('Employee.delete() error:', err);
-      throw err;
-    }
+    const { error } = await supabase
+      .from('inventory')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
   },
 
-  filter: createFilterMethod('employees'),
+  filter: createFilterMethod('inventory'),
 };
 
 // ============================================================

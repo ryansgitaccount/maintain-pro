@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Save, Plus } from "lucide-react";
+import { X, Save, Plus, Edit, Trash2 } from "lucide-react";
 
 export default function MachineForm({ machine, onSubmit, onCancel }) {
   const [formData, setFormData] = useState(machine || {
@@ -26,6 +26,8 @@ export default function MachineForm({ machine, onSubmit, onCancel }) {
     notes: []
   });
   const [newNote, setNewNote] = useState("");
+  const [editingNoteIndex, setEditingNoteIndex] = useState(null);
+  const [editingNoteText, setEditingNoteText] = useState("");
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -46,6 +48,38 @@ export default function MachineForm({ machine, onSubmit, onCancel }) {
         notes: [...existingNotes, noteEntry]
     }));
     setNewNote("");
+  };
+
+  const handleDeleteNote = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      notes: prev.notes.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleEditNote = (index) => {
+    setEditingNoteIndex(index);
+    setEditingNoteText(formData.notes[index].note);
+  };
+
+  const handleSaveEditNote = (index) => {
+    if (editingNoteText.trim() === "") return;
+    const updatedNotes = [...formData.notes];
+    updatedNotes[index] = {
+      ...updatedNotes[index],
+      note: editingNoteText
+    };
+    setFormData(prev => ({
+      ...prev,
+      notes: updatedNotes
+    }));
+    setEditingNoteIndex(null);
+    setEditingNoteText("");
+  };
+
+  const handleCancelEditNote = () => {
+    setEditingNoteIndex(null);
+    setEditingNoteText("");
   };
 
   const handleSubmit = (e) => {
@@ -282,11 +316,67 @@ export default function MachineForm({ machine, onSubmit, onCancel }) {
                 </Button>
             </div>
             {Array.isArray(formData.notes) && formData.notes.length > 0 && (
-                <div className="mt-2 space-y-2 max-h-40 overflow-y-auto bg-slate-50 p-2 rounded-md border">
+                <div className="mt-2 space-y-2 max-h-60 overflow-y-auto bg-slate-50 p-3 rounded-md border">
                     {formData.notes.map((n, i) => (
-                        <p key={i} className="text-sm text-slate-600 border-b pb-1">
-                            {n.date ? `[${new Date(n.date).toLocaleDateString()} ${new Date(n.date).toLocaleTimeString()}] ` : ''}{n.note}
-                        </p>
+                        <div key={i} className="text-sm bg-white p-2 rounded border border-slate-200 shadow-sm">
+                            {editingNoteIndex === i ? (
+                                <div className="space-y-2">
+                                    <Textarea
+                                        value={editingNoteText}
+                                        onChange={(e) => setEditingNoteText(e.target.value)}
+                                        rows={2}
+                                        className="w-full"
+                                    />
+                                    <div className="flex gap-2 justify-end">
+                                        <Button 
+                                            type="button" 
+                                            variant="outline" 
+                                            size="sm"
+                                            onClick={handleCancelEditNote}
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button 
+                                            type="button" 
+                                            size="sm"
+                                            onClick={() => handleSaveEditNote(i)}
+                                            className="bg-slate-800 hover:bg-slate-700"
+                                        >
+                                            Save
+                                        </Button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    <div className="flex justify-between items-start gap-2">
+                                        <p className="text-slate-700 flex-1">{n.note}</p>
+                                        <div className="flex gap-1">
+                                            <Button 
+                                                type="button" 
+                                                variant="ghost" 
+                                                size="icon"
+                                                className="h-6 w-6"
+                                                onClick={() => handleEditNote(i)}
+                                            >
+                                                <Edit className="w-3 h-3" />
+                                            </Button>
+                                            <Button 
+                                                type="button" 
+                                                variant="ghost" 
+                                                size="icon"
+                                                className="h-6 w-6 text-red-600 hover:text-red-700"
+                                                onClick={() => handleDeleteNote(i)}
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-slate-400 mt-1">
+                                        {n.date ? `${new Date(n.date).toLocaleDateString()} ${new Date(n.date).toLocaleTimeString()}` : ''}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     ))}
                 </div>
             )}
