@@ -25,9 +25,10 @@ export default function InventoryForm({ item, machines, onSubmit, onCancel, open
     service_interval: '',
     part_number_oem: '',
     part_number_aftermarket: '',
-    notes: '',
+    notes_capacities: '',
     // Legacy fields (still supported)
     part_name: '',
+    notes: '',
     part_number: '',
     supplier: '',
     location: '',
@@ -49,9 +50,10 @@ export default function InventoryForm({ item, machines, onSubmit, onCancel, open
         service_interval: item.service_interval || '',
         part_number_oem: item.part_number_oem || '',
         part_number_aftermarket: item.part_number_aftermarket || '',
-        notes: item.notes || '',
+        notes_capacities: item.notes_capacities || item.notes || '',
         // Legacy fields
         part_name: item.part_name || '',
+        notes: item.notes || '',
         part_number: item.part_number || '',
         supplier: item.supplier || '',
         location: item.location || '',
@@ -72,9 +74,10 @@ export default function InventoryForm({ item, machines, onSubmit, onCancel, open
         service_interval: '',
         part_number_oem: '',
         part_number_aftermarket: '',
-        notes: '',
+        notes_capacities: '',
         part_name: '',
         part_number: '',
+        notes: '',
         supplier: '',
         location: '',
         reorder_level: 0,
@@ -108,7 +111,8 @@ export default function InventoryForm({ item, machines, onSubmit, onCancel, open
     onSubmit(payload);
   };
 
-  const machineTypes = [...new Set(machines.map(m => m.machine_type).filter(Boolean))].sort();
+  const machineTypes = [...new Set(machines.map(m => m.machine_type).filter(Boolean))].filter(type => type && type.trim()).sort();
+  const validMachines = machines.filter(m => m.id && m.id.trim());
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
@@ -234,11 +238,11 @@ export default function InventoryForm({ item, machines, onSubmit, onCancel, open
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-slate-900 border-b pb-2">Additional Information</h3>
               <div className="space-y-2">
-                <Label htmlFor="notes">Notes / Capacities</Label>
+                <Label htmlFor="notes_capacities">Notes / Capacities</Label>
                 <Textarea 
-                  id="notes" 
-                  value={formData.notes} 
-                  onChange={(e) => handleInputChange('notes', e.target.value)}
+                  id="notes_capacities" 
+                  value={formData.notes_capacities} 
+                  onChange={(e) => handleInputChange('notes_capacities', e.target.value)}
                   placeholder="e.g., Use Fleetguard, Oil capacity: 15L"
                   rows={3}
                 />
@@ -270,12 +274,11 @@ export default function InventoryForm({ item, machines, onSubmit, onCancel, open
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="machine_type">Machine Type</Label>
-                  <Select value={formData.machine_type} onValueChange={value => handleInputChange('machine_type', value)}>
+                  <Select value={formData.machine_type || undefined} onValueChange={value => handleInputChange('machine_type', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select machine type..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
                       <SelectItem value="general">General Stock</SelectItem>
                       {machineTypes.map(type => (
                         <SelectItem key={type} value={type}>
@@ -287,13 +290,12 @@ export default function InventoryForm({ item, machines, onSubmit, onCancel, open
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="machine_id">Specific Machine</Label>
-                  <Select value={formData.machine_id} onValueChange={value => handleInputChange('machine_id', value)}>
+                  <Select value={formData.machine_id || undefined} onValueChange={value => handleInputChange('machine_id', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select specific machine..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
-                      {machines.sort((a,b) => (a.plant_id || '').localeCompare(b.plant_id || '')).map(machine => (
+                      {validMachines.sort((a,b) => (a.plant_id || '').localeCompare(b.plant_id || '')).map(machine => (
                         <SelectItem key={machine.id} value={machine.id}>
                           {machine.plant_id} - {machine.model}
                         </SelectItem>

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Plus, Loader2, Package } from 'lucide-react';
 import InventoryForm from '../components/inventory/InventoryForm';
 import PartsInventoryTable from '../components/inventory/PartsInventoryTable';
-import PartsCSVImportDialog from '../components/inventory/PartsCSVImportDialog';
 import { useToast } from "@/components/ui/useToast";
 import {
   AlertDialog,
@@ -122,13 +121,10 @@ export default function WorkshopInventoryPage() {
                             Manage parts inventory with service intervals and machine assignments
                         </p>
                     </div>
-                    <div className="flex gap-2 w-full sm:w-auto">
-                        <PartsCSVImportDialog onImportComplete={loadData} />
-                        <Button onClick={handleAddNew} className="flex-1 sm:flex-none">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add Part
-                        </Button>
-                    </div>
+                    <Button onClick={handleAddNew} className="w-full sm:w-auto">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Part
+                    </Button>
                 </div>
 
                 {/* Loading State */}

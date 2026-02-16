@@ -21,7 +21,7 @@ import {
   ArrowDown,
   Edit,
   Trash2,
-  Download,
+
   X
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -137,7 +137,7 @@ export default function PartsInventoryTable({ data, onEdit, onDelete }) {
         enableColumnFilter: true,
       },
       {
-        accessorKey: 'notes',
+        accessorKey: 'notes_capacities',
         header: 'Notes',
         cell: ({ getValue }) => {
           const notes = getValue();
@@ -198,15 +198,16 @@ export default function PartsInventoryTable({ data, onEdit, onDelete }) {
   // Get unique values for dropdown filters
   const uniqueValues = useMemo(() => {
     return {
-      machine_model: [...new Set(data.map(item => item.machine_model).filter(Boolean))].sort(),
-      service_interval: [...new Set(data.map(item => item.service_interval).filter(Boolean))].sort(),
-      unique_id: [...new Set(data.map(item => item.unique_id).filter(Boolean))].sort(),
-      nbl_code: [...new Set(data.map(item => item.nbl_code).filter(Boolean))].sort(),
+      machine_model: [...new Set(data.map(item => item.machine_model).filter(Boolean))].filter(v => v && v.trim()).sort(),
+      service_interval: [...new Set(data.map(item => item.service_interval).filter(Boolean))].filter(v => v && v.trim()).sort(),
+      unique_id: [...new Set(data.map(item => item.unique_id).filter(Boolean))].filter(v => v && v.trim()).sort(),
+      nbl_code: [...new Set(data.map(item => item.nbl_code).filter(Boolean))].filter(v => v && v.trim()).sort(),
     };
   }, [data]);
 
   const getColumnFilterValue = (columnId) => {
-    return table.getColumn(columnId)?.getFilterValue() ?? '';
+    const value = table.getColumn(columnId)?.getFilterValue();
+    return value || undefined;
   };
 
   const setColumnFilterValue = (columnId, value) => {
@@ -216,34 +217,6 @@ export default function PartsInventoryTable({ data, onEdit, onDelete }) {
   const clearAllFilters = () => {
     setGlobalFilter('');
     setColumnFilters([]);
-  };
-
-  const exportToCSV = () => {
-    const rows = table.getFilteredRowModel().rows;
-    const csvData = [
-      ['Machine/Model', 'Fleet ID', 'NBL Code', 'Serial No.', 'Part Description', 'Qty', 'Service Interval', 'OEM Part #', 'Aftermarket #', 'Notes'],
-      ...rows.map(row => [
-        row.original.machine_model || '',
-        row.original.unique_id || '',
-        row.original.nbl_code || '',
-        row.original.serial_number || '',
-        row.original.part_description || '',
-        row.original.quantity_on_hand || '',
-        row.original.service_interval || '',
-        row.original.part_number_oem || '',
-        row.original.part_number_aftermarket || '',
-        row.original.notes || '',
-      ])
-    ];
-    
-    const csvContent = csvData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `parts-inventory-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
-    window.URL.revokeObjectURL(url);
   };
 
   const activeFiltersCount = columnFilters.length + (globalFilter ? 1 : 0);
@@ -261,18 +234,12 @@ export default function PartsInventoryTable({ data, onEdit, onDelete }) {
               className="max-w-md"
             />
           </div>
-          <div className="flex gap-2">
-            {activeFiltersCount > 0 && (
-              <Button variant="outline" onClick={clearAllFilters}>
-                <X className="h-4 w-4 mr-2" />
-                Clear Filters ({activeFiltersCount})
-              </Button>
-            )}
-            <Button variant="outline" onClick={exportToCSV}>
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
+          {activeFiltersCount > 0 && (
+            <Button variant="outline" onClick={clearAllFilters}>
+              <X className="h-4 w-4 mr-2" />
+              Clear Filters ({activeFiltersCount})
             </Button>
-          </div>
+          )}
         </div>
       </Card>
 
